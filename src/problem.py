@@ -147,8 +147,3 @@ class Problem:
             self._extract_rooms(file_content, number_of_rooms)
             self._extract_curricula(file_content, number_of_curriculum)
             self._extract_constraints(file_content, number_of_constraints)
-
-            print(len(self.courses))
-            print(len(self.rooms))
-            print(len(self.curricula))
-            print(len(self.constraints))

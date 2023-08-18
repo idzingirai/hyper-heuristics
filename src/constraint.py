@@ -1,7 +1,6 @@
 from typing import List
 
 from course import Course
-from src.course import Course
 
 
 def _get_course(course_id: str, courses: List[Course]) -> Course | None:
