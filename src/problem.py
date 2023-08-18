@@ -1,17 +1,17 @@
 import os
-from typing import List
+from typing import List, AnyStr
 
 import config
+from constraint import Constraint
 from course import Course
 from curriculum import Curriculum
 from room import Room
-from constraint import Constraint
 
 
 class Problem:
     def __init__(self, problem_instance_index: int):
-        problem_instance_filenames_list = os.listdir(config.DATA_PATH)
-        self.selected_problem_instance_filename = problem_instance_filenames_list[
+        problem_instance_filenames_list: List[str] = os.listdir(config.DATA_PATH)
+        self.selected_problem_instance_filename: str = problem_instance_filenames_list[
             problem_instance_index
         ]
         self.name: str | None = None
@@ -23,7 +23,7 @@ class Problem:
     def _extract_basic_information(self, file_content: List[str]):
         """
             Extracts the basic information from the file content.
-            :param file_content
+            :param file_content: List[str]
             :return: extracted information
         """
 
@@ -47,8 +47,8 @@ class Problem:
     def _extract_courses(self, file_content: List[str], number_of_courses: int) -> None:
         """
             Extracts the courses from the file content.
-            :param file_content
-            :param number_of_courses to extract
+            :param file_content: List[str]
+            :param number_of_courses to extract: int
             :return: None
         """
 
@@ -59,62 +59,80 @@ class Problem:
                 courses_string_index + 1,
                 courses_string_index + 1 + number_of_courses
         ):
-            course = Course(file_content[course_index])
+            course: Course = Course(course_content=file_content[course_index])
             self.courses.append(course)
 
     def _extract_rooms(self, file_content: List[str], number_of_rooms: int) -> None:
         """
             Extracts the rooms from the file content.
-            :param file_content
-            :param number_of_rooms
+            :param file_content: List[str]
+            :param number_of_rooms: int
             :return: None
         """
 
-        rooms_string_index = file_content.index("ROOMS:\n")
+        rooms_string_index: int = file_content.index("ROOMS:\n")
         self.rooms = []
+
         for room_index in range(
                 rooms_string_index + 1,
                 rooms_string_index + 1 + number_of_rooms
         ):
-            room = Room(file_content[room_index])
+            room: Room = Room(room_content=file_content[room_index])
             self.rooms.append(room)
 
     def _extract_curricula(self, file_content: List[str], number_of_curriculums: int) -> None:
         """
             Extracts the curricula from the file content.
-            :param file_content
-            :param number_of_curriculums
+            :param file_content: List[str]
+            :param number_of_curriculums: int
             :return: None
         """
-        curricula_string_index = file_content.index("CURRICULA:\n")
+
+        curricula_string_index: int = file_content.index("CURRICULA:\n")
         self.curricula = []
 
         for curricula_index in range(
                 curricula_string_index + 1,
                 curricula_string_index + 1 + number_of_curriculums
         ):
-            curriculum = Curriculum(file_content[curricula_index])
+            curriculum: Curriculum = Curriculum(curricula_content=file_content[curricula_index])
             for course in self.courses:
                 if course.course_id in file_content[curricula_index].split():
                     curriculum.courses.append(course)
             self.curricula.append(curriculum)
 
-    def _extract_constraints(self, file_content, number_of_constraints):
-        constraints_string_index = file_content.index("UNAVAILABILITY_CONSTRAINTS:\n")
+    def _extract_constraints(self, file_content: List[str], number_of_constraints: int) -> None:
+        """
+            Extracts the constraints from the file content.
+            :param file_content: List[str]
+            :param number_of_constraints: int
+            :return: None
+        """
+
+        constraints_string_index: int = file_content.index("UNAVAILABILITY_CONSTRAINTS:\n")
         self.constraints = []
+
         for constraint_index in range(
                 constraints_string_index + 1,
                 constraints_string_index + 1 + number_of_constraints
         ):
-            constraint = Constraint(file_content[constraint_index], self.courses)
+            constraint = Constraint(
+                constraint_content=file_content[constraint_index],
+                courses=self.courses
+            )
             self.constraints.append(constraint)
 
-    def initialize(self):
+    def initialize(self) -> None:
+        """
+            Initializes the problem instance. Reads the file and extracts the information.
+            :return: None
+        """
+
         with open(
                 f"{config.DATA_PATH}{self.selected_problem_instance_filename}",
                 "r"
         ) as problem_instance_file:
-            file_content = problem_instance_file.readlines()
+            file_content: List[AnyStr] = problem_instance_file.readlines()
 
             (
                 number_of_constraints,
@@ -129,3 +147,8 @@ class Problem:
             self._extract_rooms(file_content, number_of_rooms)
             self._extract_curricula(file_content, number_of_curriculum)
             self._extract_constraints(file_content, number_of_constraints)
+
+            print(len(self.courses))
+            print(len(self.rooms))
+            print(len(self.curricula))
+            print(len(self.constraints))

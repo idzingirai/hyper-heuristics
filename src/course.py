@@ -1,7 +1,7 @@
 class Course:
 
-    def __init__(self, course_content_list: str):
-        course_content_list = course_content_list.split()
+    def __init__(self, course_content: str):
+        course_content_list = course_content.split()
 
         self.course_id = course_content_list[0]
         self.teacher_id = course_content_list[1]

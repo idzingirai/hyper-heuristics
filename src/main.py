@@ -12,4 +12,5 @@ if __name__ == "__main__":
     for problem_instance_index in PROBLEM_INSTANCES_INDICES:
         problem = Problem(problem_instance_index=problem_instance_index)
         problem.initialize()
+
         break
