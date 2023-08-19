@@ -19,6 +19,7 @@ if __name__ == "__main__":
         problem_instance.initialize()
 
         timetable = Timetable(problem=problem_instance)
+        timetable.initialize_slots()
 
         validator = Validator(timetable)
         print(validator.get_violated_hard_constraints())

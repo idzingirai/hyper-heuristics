@@ -88,8 +88,10 @@ def _get_number_of_lectures(course_id: str, schedule: List[List[Slot]]) -> int:
     slot: Slot
     for day in schedule:
         for slot in day:
-            if len(slot.course_room_pair) > 0 and slot.course_room_pair[0].course_id == course_id:
-                number_of_lectures += 1
+            course: Course
+            for course, _ in slot.course_room_pair:
+                if course.course_id == course_id:
+                    number_of_lectures += 1
 
     return number_of_lectures
 
