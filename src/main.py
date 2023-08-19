@@ -1,5 +1,6 @@
 import random
 import sys
+import time
 
 from config import SEED, PROBLEM_INSTANCES_INDICES
 from problem import Problem
@@ -12,6 +13,8 @@ if __name__ == "__main__":
     random.seed(seed)
 
     for problem_instance_index in PROBLEM_INSTANCES_INDICES:
+        start_time = time.time()
+
         problem_instance = Problem(problem_instance_index=problem_instance_index)
         problem_instance.initialize()
 
@@ -20,4 +23,7 @@ if __name__ == "__main__":
         validator = Validator(timetable)
         print(validator.get_violated_hard_constraints())
 
+        end_time = time.time()
+        time_elapsed = end_time - start_time
+        print(f"Problem instance {problem_instance_index} took {time_elapsed} seconds to solve.")
         break
