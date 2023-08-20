@@ -10,4 +10,4 @@ class Curriculum:
 
         self.curricula_id: str = curricula_content_list[0]
         self.number_of_courses: int = int(curricula_content_list[1])
-        self.courses: List[Course] = []
+        self.course_ids: List[str] = []

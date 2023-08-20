@@ -94,7 +94,7 @@ class Problem:
 
             for course in self.courses:
                 if course.course_id in self.file_content[curricula_index].split():
-                    curriculum.courses.append(course)
+                    curriculum.course_ids.append(course.course_id)
             self.curricula.append(curriculum)
 
     def _extract_constraints(self) -> None:
@@ -110,10 +110,7 @@ class Problem:
                 constraints_string_index + 1,
                 constraints_string_index + 1 + self.number_of_constraints
         ):
-            constraint = Constraint(
-                constraint_content=self.file_content[constraint_index],
-                courses=self.courses
-            )
+            constraint = Constraint(constraint_content=self.file_content[constraint_index])
             self.constraints.append(constraint)
 
     def initialize(self) -> None:

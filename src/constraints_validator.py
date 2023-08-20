@@ -1,3 +1,4 @@
+from itertools import combinations
 from typing import List
 
 from constraint import Constraint
@@ -18,16 +19,17 @@ def _get_number_of_conflict_violations(curricula: List[Curriculum], slot: Slot) 
 
     number_of_violations: int = 0
 
-    a: Course
-    b: Course
-    idx: int
-    for idx, a in enumerate(slot.course_room_pair):
-        for b in slot.course_room_pair[idx + 1:]:
+    # get all course ids in the slot
+    course_ids: List[str] = [course.course_id for course, _ in slot.course_room_pair]
+    course_combinations: List[List[str]] = list(combinations(course_ids, 2))
 
-            curriculum: Curriculum
-            for curriculum in curricula:
-                if a.course_id in curriculum.courses and b.course_id in curriculum.courses:
-                    number_of_violations += 1
+    for course_combination in course_combinations:
+        for curriculum in curricula:
+            if (
+                    course_combination[0] in curriculum.course_ids
+                    and course_combination[1] in curriculum.course_ids
+            ):
+                number_of_violations += 1
 
     return number_of_violations
 
@@ -68,7 +70,7 @@ def _get_number_of_unavailability_violations(
     for constraint in constraints:
         slot: Slot = schedule[constraint.day][constraint.period]
         course_id_list: List[str] = [course.course_id for course, room in slot.course_room_pair]
-        if constraint.course.course_id in course_id_list:
+        if constraint.course_id in course_id_list:
             number_of_violations += 1
 
     return number_of_violations
