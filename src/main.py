@@ -21,14 +21,9 @@ if __name__ == "__main__":
         timetable = Timetable(problem=problem_instance)
         timetable.initialize_slots()
 
-        # print 2d array of slots
-        for day in timetable.schedule:
-            for slot in day:
-                print(len(slot.course_room_pair), end=" ")
-            print()
-
         validator = Validator(timetable)
-        print(validator.get_violated_hard_constraints())
+        print("Hard Constraints Violated: ", validator.get_violated_hard_constraints())
+        print("Soft Constraints Violated: ", validator.get_violated_soft_constraints())
 
         end_time = time.time()
         time_elapsed = end_time - start_time

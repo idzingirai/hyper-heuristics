@@ -8,6 +8,7 @@ from slot import Slot
 from src.problem import Problem
 from timetable import Timetable
 
+#   For Hard Constraints
 
 def _get_number_of_conflict_violations(curricula: List[Curriculum], slot: Slot) -> int:
     """
@@ -40,7 +41,7 @@ def _get_number_of_room_occupancy_violations(slot: Slot) -> int:
         :param slot: Slot
         :return: number_of_violations
     """
-    room_ids: List[str] = [room.room_id for _, room in slot.course_room_pair]
+    room_ids: List[str] = [room.room_id for _, room in slot.course_room_pair if room is not None]
     return len(room_ids) - len(set(room_ids))
 
 
@@ -119,13 +120,68 @@ def _get_number_of_lecture_allocations_violations(
     return number_of_violations
 
 
+#  For Soft Constraints
+def _get_number_of_room_capacity_violations(schedule: List[List[Slot]]) -> int:
+    number_of_violations: int = 0
+
+    for day in schedule:
+        for slot in day:
+            for course, room in slot.course_room_pair:
+                if course.number_of_students > room.room_capacity:
+                    number_of_violations += 1
+
+    return number_of_violations
+
+
+def _get_number_of_minimum_working_days_violations(
+        courses: List[Course],
+        schedule: List[List[Slot]]
+) -> int:
+    # check if the course is scheduled on a specific day, then the next time the course is scheduled is x minimum working days
+    # after the first time it was scheduled
+    number_of_violations: int = 0
+
+    for course in courses:
+        course_id: str = course.course_id
+        minimum_working_days: int = course.min_working_days
+
+        number_of_lectures: int = _get_number_of_lectures(course_id, schedule)
+        if number_of_lectures > 0:
+            first_day: int = -1
+            last_day: int = -1
+
+            for day in range(len(schedule)):
+                for slot in range(len(schedule[day])):
+                    for c, _ in schedule[day][slot].course_room_pair:
+                        if  c.course_id == course_id:
+                            if first_day == -1:
+                                first_day = day
+                            last_day = day
+
+            if last_day - first_day + 1 < minimum_working_days:
+                number_of_violations += 1
+
+    return number_of_violations
+
+
 class Validator:
 
     def __init__(self, timetable: Timetable):
         self.timetable = timetable
 
     def get_violated_soft_constraints(self) -> int:
-        return 0
+        number_of_constraints_violated: int = 0
+
+        number_of_constraints_violated += _get_number_of_room_capacity_violations(
+            self.timetable.schedule
+        )
+
+        number_of_constraints_violated += _get_number_of_minimum_working_days_violations(
+            self.timetable.problem.courses,
+            self.timetable.schedule
+        )
+
+        return number_of_constraints_violated
 
     def get_violated_hard_constraints(self) -> int:
         """
@@ -144,6 +200,8 @@ class Validator:
             schedule
         )
 
+        conflict_violations_count = 0
+
         day: List[Slot]
         slot: Slot
         for day in schedule:
@@ -153,12 +211,20 @@ class Validator:
                     slot
                 )
 
+                conflict_violations_count += _get_number_of_conflict_violations(
+                    timetable_problem.curricula,
+                    slot
+                )
+
                 number_of_constraints_violated += _get_number_of_room_occupancy_violations(slot)
+
                 number_of_constraints_violated += _get_number_of_teacher_violations(slot)
 
         number_of_constraints_violated += _get_number_of_unavailability_violations(
             timetable_problem.constraints,
             schedule
         )
+
+        print("Conflict violations: ", conflict_violations_count)
 
         return number_of_constraints_violated
