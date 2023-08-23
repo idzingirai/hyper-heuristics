@@ -19,7 +19,6 @@ if __name__ == "__main__":
 
         timetable = Timetable(problem=problem_instance)
         timetable.initialize_slots()
-        timetable.print()
 
         end_time = time.time()
         time_elapsed = end_time - start_time

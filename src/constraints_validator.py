@@ -4,7 +4,6 @@ from typing import List
 from constraint import Constraint
 from course import Course
 from curriculum import Curriculum
-from problem import Problem
 from room import Room
 from slot import Slot
 from timetable import Timetable
@@ -264,76 +263,52 @@ def _get_number_of_room_stability_violations(
     return number_of_violations
 
 
-class Validator:
+def get_num_of_violated_soft_constraints(timetable: Timetable) -> int:
+    number_of_constraints_violated: int = 0
+    courses = timetable.problem.courses
+    schedule = timetable.schedule
 
-    def __init__(self, timetable: Timetable):
-        self.timetable = timetable
+    number_of_constraints_violated += _get_number_of_room_capacity_violations(schedule)
+    number_of_constraints_violated += _get_number_of_room_stability_violations(schedule)
+    number_of_constraints_violated += _get_number_of_minimum_working_days_violations(
+        courses,
+        schedule
+    )
 
-    def get_violated_soft_constraints(self) -> int:
-        number_of_constraints_violated: int = 0
-        courses = self.timetable.problem.courses
-        schedule = self.timetable.schedule
+    number_of_constraints_violated += _get_number_of_curriculum_compactness_violations(
+        timetable.problem.curricula,
+        schedule
+    )
 
-        number_of_constraints_violated += _get_number_of_room_capacity_violations(
-            schedule
-        )
+    return number_of_constraints_violated
 
-        number_of_constraints_violated += _get_number_of_minimum_working_days_violations(
-            courses,
-            schedule
-        )
 
-        number_of_constraints_violated += _get_number_of_curriculum_compactness_violations(
-            self.timetable.problem.curricula,
-            schedule
-        )
+def get_num_of_violated_hard_constraints(timetable: Timetable) -> int:
+    """
+    Validates the timetable and returns the number of hard constraints violated.
+    :return: number_of_hard_constraints_violated
+    """
 
-        number_of_constraints_violated += _get_number_of_room_stability_violations(schedule)
+    number_of_constraints_violated: int = 0
+    schedule: List[List[Slot]] = timetable.schedule
+    curricula: List[Curriculum] = timetable.problem.curricula
 
-        return number_of_constraints_violated
+    number_of_constraints_violated += _get_number_of_lecture_allocations_violations(
+        timetable.courses,
+        schedule
+    )
 
-    def get_violated_hard_constraints(self) -> int:
-        """
-        Validates the timetable and returns the number of hard constraints violated.
-        :return: number_of_hard_constraints_violated
-        """
+    day: List[Slot]
+    slot: Slot
+    for day in schedule:
+        for slot in day:
+            number_of_constraints_violated += _get_number_of_conflict_violations(curricula, slot)
+            number_of_constraints_violated += _get_number_of_room_occupancy_violations(slot)
+            number_of_constraints_violated += _get_number_of_teacher_violations(slot)
 
-        number_of_constraints_violated: int = 0
+    number_of_constraints_violated += _get_number_of_unavailability_violations(
+        timetable.constraints,
+        schedule
+    )
 
-        timetable = self.timetable
-        timetable_problem: Problem = timetable.problem
-        schedule: List[List[Slot]] = timetable.schedule
-
-        number_of_constraints_violated += _get_number_of_lecture_allocations_violations(
-            timetable_problem.courses,
-            schedule
-        )
-
-        conflict_violations_count = 0
-
-        day: List[Slot]
-        slot: Slot
-        for day in schedule:
-            for slot in day:
-                number_of_constraints_violated += _get_number_of_conflict_violations(
-                    timetable_problem.curricula,
-                    slot
-                )
-
-                conflict_violations_count += _get_number_of_conflict_violations(
-                    timetable_problem.curricula,
-                    slot
-                )
-
-                number_of_constraints_violated += _get_number_of_room_occupancy_violations(slot)
-
-                number_of_constraints_violated += _get_number_of_teacher_violations(slot)
-
-        number_of_constraints_violated += _get_number_of_unavailability_violations(
-            timetable_problem.constraints,
-            schedule
-        )
-
-        print("Conflict violations: ", conflict_violations_count)
-
-        return number_of_constraints_violated
+    return number_of_constraints_violated
