@@ -4,6 +4,8 @@ import time
 
 from config import SEED, PROBLEM_INSTANCES_INDICES
 from problem import Problem
+from src.constraints_validator import get_num_of_violated_hard_constraints, \
+    get_num_of_violated_soft_constraints
 from timetable import Timetable
 
 if __name__ == "__main__":
@@ -20,8 +22,28 @@ if __name__ == "__main__":
         timetable = Timetable(problem=problem_instance)
         timetable.initialize_slots()
 
+        print(
+            "Hard constraints cost before solving: ",
+            get_num_of_violated_hard_constraints(
+                timetable.schedule,
+                timetable.constraints,
+                timetable.curricula,
+                timetable.courses
+            )
+        )
+
+        print(
+            "Soft constraints cost before solving: ",
+            get_num_of_violated_soft_constraints(
+                timetable.schedule,
+                timetable.curricula,
+                timetable.courses
+            )
+        )
+
         end_time = time.time()
         time_elapsed = end_time - start_time
         print(
-            f"Problem instance {problem_instance_index + 1} took {time_elapsed} seconds to solve.")
+            f"Problem instance {problem_instance_index + 1} took {time_elapsed} seconds to solve."
+        )
         break

@@ -6,7 +6,6 @@ from course import Course
 from curriculum import Curriculum
 from room import Room
 from slot import Slot
-from timetable import Timetable
 
 
 #   For Hard Constraints
@@ -263,10 +262,12 @@ def _get_number_of_room_stability_violations(
     return number_of_violations
 
 
-def get_num_of_violated_soft_constraints(timetable: Timetable) -> int:
+def get_num_of_violated_soft_constraints(
+        schedule: List[List[Slot]],
+        curricula: List[Curriculum],
+        courses: List[Course]
+) -> int:
     number_of_constraints_violated: int = 0
-    courses = timetable.problem.courses
-    schedule = timetable.schedule
 
     number_of_constraints_violated += _get_number_of_room_capacity_violations(schedule)
     number_of_constraints_violated += _get_number_of_room_stability_violations(schedule)
@@ -276,25 +277,28 @@ def get_num_of_violated_soft_constraints(timetable: Timetable) -> int:
     )
 
     number_of_constraints_violated += _get_number_of_curriculum_compactness_violations(
-        timetable.problem.curricula,
+        curricula,
         schedule
     )
 
     return number_of_constraints_violated
 
 
-def get_num_of_violated_hard_constraints(timetable: Timetable) -> int:
+def get_num_of_violated_hard_constraints(
+        schedule: List[List[Slot]],
+        constraints: List[Constraint],
+        curricula: List[Curriculum],
+        courses: List[Course]
+) -> int:
     """
     Validates the timetable and returns the number of hard constraints violated.
     :return: number_of_hard_constraints_violated
     """
 
     number_of_constraints_violated: int = 0
-    schedule: List[List[Slot]] = timetable.schedule
-    curricula: List[Curriculum] = timetable.problem.curricula
 
     number_of_constraints_violated += _get_number_of_lecture_allocations_violations(
-        timetable.courses,
+        courses,
         schedule
     )
 
@@ -307,7 +311,7 @@ def get_num_of_violated_hard_constraints(timetable: Timetable) -> int:
             number_of_constraints_violated += _get_number_of_teacher_violations(slot)
 
     number_of_constraints_violated += _get_number_of_unavailability_violations(
-        timetable.constraints,
+        constraints,
         schedule
     )
 
