@@ -8,8 +8,8 @@ from slot import Slot
 from src.problem import Problem
 from timetable import Timetable
 
-#   For Hard Constraints
 
+#   For Hard Constraints
 def _get_number_of_conflict_violations(curricula: List[Curriculum], slot: Slot) -> int:
     """
         Two courses of the same curriculum must not be scheduled at the same time.
@@ -133,33 +133,75 @@ def _get_number_of_room_capacity_violations(schedule: List[List[Slot]]) -> int:
     return number_of_violations
 
 
+def _get_course(course_id: str, courses: List[Course]) -> Course:
+    for course in courses:
+        if course.course_id == course_id:
+            return course
+
+
 def _get_number_of_minimum_working_days_violations(
         courses: List[Course],
         schedule: List[List[Slot]]
 ) -> int:
-    # check if the course is scheduled on a specific day, then the next time the course is scheduled is x minimum working days
-    # after the first time it was scheduled
     number_of_violations: int = 0
 
-    for course in courses:
-        course_id: str = course.course_id
-        minimum_working_days: int = course.min_working_days
+    for x in range(0, len(schedule)):
+        for y in range(0, len(schedule[x])):
+            for course, _ in schedule[x][y].course_room_pair:
+                for a in range(x + 1, len(schedule)):
+                    for b in range(0, len(schedule[a])):
+                        for course2, _ in schedule[a][b].course_room_pair:
+                            if course.course_id == course2.course_id:
+                                # check the minimum working days constraint
+                                if abs(a - x) < _get_course(course.course_id,
+                                                            courses).min_working_days:
+                                    number_of_violations += 1
 
-        number_of_lectures: int = _get_number_of_lectures(course_id, schedule)
-        if number_of_lectures > 0:
-            first_day: int = -1
-            last_day: int = -1
+    return number_of_violations
 
-            for day in range(len(schedule)):
-                for slot in range(len(schedule[day])):
-                    for c, _ in schedule[day][slot].course_room_pair:
-                        if  c.course_id == course_id:
-                            if first_day == -1:
-                                first_day = day
-                            last_day = day
 
-            if last_day - first_day + 1 < minimum_working_days:
-                number_of_violations += 1
+def _check_if_course_is_in_curriculum(
+        first_course: str,
+        course_ids: List[str],
+        curricula: List[Curriculum]
+) -> bool:
+    for curriculum in curricula:
+        for course_id in curriculum.course_ids:
+            if first_course in curriculum.course_ids and course_id in course_ids:
+                return True
+    return False
+
+def _get_number_of_curriculum_compactness_violations(
+        curricula: List[Curriculum],
+        schedule: List[List[Slot]]
+) -> int:
+    number_of_violations: int = 0
+
+    for x in range(0, len(schedule)):
+        for y in range(0, len(schedule[x])):
+            for course, _ in schedule[x][y].course_room_pair:
+                for index in range(y + 1, len(schedule[x])):
+                    course_ids: List[str] = [
+                        course.course_id for course, _ in schedule[x][index].course_room_pair
+                    ]
+                    if not _check_if_course_is_in_curriculum(course.course_id, course_ids, curricula):
+                        number_of_violations += 1
+
+    return number_of_violations
+
+
+def _get_number_of_room_stability_violations(courses: List[Course],
+                                             schedule: List[List[Slot]]) -> int:
+    number_of_violations: int = 0
+    course_first_room_map: dict = {}
+
+    for day_slots in schedule:
+        for slot in day_slots:
+            for course, room in slot.course_room_pair:
+                if course.course_id not in course_first_room_map:
+                    course_first_room_map[course.course_id] = room.room_id
+                if room.room_id != course_first_room_map[course.course_id]:
+                    number_of_violations += 1
 
     return number_of_violations
 
@@ -177,6 +219,11 @@ class Validator:
         )
 
         number_of_constraints_violated += _get_number_of_minimum_working_days_violations(
+            self.timetable.problem.courses,
+            self.timetable.schedule
+        )
+
+        number_of_constraints_violated += _get_number_of_room_stability_violations(
             self.timetable.problem.courses,
             self.timetable.schedule
         )

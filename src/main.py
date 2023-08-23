@@ -27,5 +27,5 @@ if __name__ == "__main__":
 
         end_time = time.time()
         time_elapsed = end_time - start_time
-        print(f"Problem instance {problem_instance_index} took {time_elapsed} seconds to solve.")
+        print(f"Problem instance {problem_instance_index + 1} took {time_elapsed} seconds to solve.")
         break
