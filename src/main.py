@@ -4,7 +4,6 @@ import time
 
 from config import SEED, PROBLEM_INSTANCES_INDICES
 from problem import Problem
-from src.constraints_validator import Validator
 from timetable import Timetable
 
 if __name__ == "__main__":
@@ -20,12 +19,10 @@ if __name__ == "__main__":
 
         timetable = Timetable(problem=problem_instance)
         timetable.initialize_slots()
-
-        validator = Validator(timetable)
-        print("Hard Constraints Violated: ", validator.get_violated_hard_constraints())
-        print("Soft Constraints Violated: ", validator.get_violated_soft_constraints())
+        timetable.print()
 
         end_time = time.time()
         time_elapsed = end_time - start_time
-        print(f"Problem instance {problem_instance_index + 1} took {time_elapsed} seconds to solve.")
+        print(
+            f"Problem instance {problem_instance_index + 1} took {time_elapsed} seconds to solve.")
         break

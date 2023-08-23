@@ -1,8 +1,8 @@
-import random
-from typing import List, Tuple, Optional
+from typing import List
 
 from constraint import Constraint
 from course import Course
+from curriculum import Curriculum
 from problem import Problem
 from room import Room
 from slot import Slot
@@ -13,18 +13,30 @@ class Timetable:
     def __init__(self, problem: Problem):
         self.problem: Problem = problem
         self.constraints: List[Constraint] = self.problem.constraints
+        self.rooms: List[Room] = self.problem.rooms
+        self.courses: List[Course] = self.problem.courses
 
         self.schedule: List[List[Slot]] = [
             [Slot() for _ in range(problem.number_of_periods_per_day)]
             for _ in range(problem.number_of_days)
         ]
 
-    def _violating_unavailability_constraint(
-            self,
-            day: int,
-            period: int,
-            course_id: str
-    ) -> bool:
+    def _already_in_slot(self, day: int, period: int, course_id: str) -> bool:
+        """
+            Helper function to check if a course is already in a slot.
+            :param day: int
+            :param period: int
+            :param course_id: str
+            :return: bool
+        """
+
+        course_ids_in_slot: List[str] = [
+            course.course_id for course, room in self.schedule[day][period].course_room_pairs
+        ]
+
+        return course_id in course_ids_in_slot
+
+    def _violating_unavailability_constraint(self, day: int, period: int, course_id: str) -> bool:
         """
             Helper function to check if a slot violates an unavailability constraint.
             :param day: int
@@ -32,6 +44,7 @@ class Timetable:
             :param course_id: str
             :return: bool
         """
+
         course_constraints = [
             constraint for constraint in self.constraints
             if constraint.course_id == course_id
@@ -42,12 +55,7 @@ class Timetable:
             course_constraints
         )
 
-    def _violating_curriculum_constraint(
-            self,
-            day: int,
-            period: int,
-            course_id: str,
-    ) -> bool:
+    def _violating_curriculum_constraint(self, day: int, period: int, course_id: str) -> bool:
         """
             Helper function to check if a slot violates a curriculum constraint.
             :param day: int
@@ -55,137 +63,145 @@ class Timetable:
             :param course_id: str
             :return: bool
         """
-        # get the list of courses ids in the slot
+
         course_ids_in_slot: List[str] = [
-            course.course_id for course, room in self.schedule[day][period].course_room_pair
+            course.course_id for course, room in self.schedule[day][period].course_room_pairs
         ]
 
+        c_id: str
         for c_id in course_ids_in_slot:
+
+            curriculum: Curriculum
             for curriculum in self.problem.curricula:
                 if c_id in curriculum.course_ids and course_id in curriculum.course_ids:
                     return True
 
         return False
 
-    def _violating_teacher_constraint(
-            self,
-            teacher_id: str,
-            course_room_pairs: List[Tuple[Course, Room]]
-    ) -> bool:
+    def _violating_teacher_constraint(self, day: int, period: int, teacher_id: str) -> bool:
         """
             Helper function to check if a slot violates a teacher constraint.
+            :param day: int
+            :param period: int
             :param teacher_id: str
-            :param course_room_pairs: List[Tuple[Course, Room]]
             :return: bool
         """
+
         teacher_ids_in_slot: List[str] = [
-            course.teacher_id for course, room in course_room_pairs
+            course.teacher_id for course, room in self.schedule[day][period].course_room_pairs
         ]
 
         return teacher_id in teacher_ids_in_slot
 
-    def _select_free_slot(self, course: Course) -> Tuple[int, int, Optional[Room]]:
-        free_slots: List[Tuple[int, int]] = []
-        for day in range(len(self.schedule)):
-            for period in range(len(self.schedule[day])):
-                if len(self.schedule[day][period].course_room_pair) == 0:
-                    free_slots.append((day, period))
+    def _violating_room_capacity_constraint(self, day: int, period: int, course_id: str) -> bool:
+        """
+            Helper function to check if a slot violates a room capacity constraint.
+            :param day: int
+            :param period:  int
+            :param course_id: str
+            :return: bool
+        """
 
-        free_slots_not_violating_unavailability_constraint: List[Tuple[int, int]] = []
-        for day, period in free_slots:
-            if not self._violating_unavailability_constraint(day, period, course.course_id):
-                free_slots_not_violating_unavailability_constraint.append((day, period))
+        course = [course for course in self.courses if course.course_id == course_id][0]
+        course_room_pairs = self.schedule[day][period].course_room_pairs
 
-        if free_slots_not_violating_unavailability_constraint:
-            day, period = random.choice(free_slots_not_violating_unavailability_constraint)
-            room = self._get_room_with_capacity(
-                course.number_of_students,
-                self.schedule[day][period].course_room_pair
-            )
-            if room:
-                return day, period, room
+        if len(course_room_pairs) == len(self.rooms):
+            return True
 
-        return -1, -1, None
-
-    def _get_feasible_slot(self, course: Course) -> Tuple[int, int, Optional[Room]]:
-        for x in range(len(self.schedule)):
-            for y in range(len(self.schedule[x])):
-                if not self._violating_unavailability_constraint(x, y, course.course_id):
-                    if not self._violating_curriculum_constraint(x, y, course.course_id):
-                        course_room_pairs = self.schedule[x][y].course_room_pair
-
-                        if (
-                                len(course_room_pairs) < self.problem.number_of_rooms - 1
-                                and not self._violating_teacher_constraint(
-                                    course.teacher_id,
-                                    course_room_pairs
-                                )
-                        ):
-
-                            room = self._get_room_with_capacity(
-                                course.number_of_students,
-                                self.schedule[x][y].course_room_pair
-                            )
-                            if room:
-                                return x, y, room
-
-        return -1, -1, None
-
-    def _get_room_with_capacity(
-            self,
-            number_of_students,
-            course_room_pairs: List[Tuple[Course, Room]]
-    ) -> Room | None:
         occupied_room_ids = [room.room_id for _, room in course_room_pairs]
         available_rooms = [
-            room for room in self.problem.rooms
-            if room.room_capacity >= number_of_students and room.room_id not in occupied_room_ids
+            room for room in self.rooms
+            if (
+                    room.room_capacity >= course.number_of_students
+                    and room.room_id not in occupied_room_ids
+            )
         ]
 
-        if available_rooms:
-            return min(
-                available_rooms,
-                key=lambda room: room.room_capacity
-            ).clone()
-        else:
-            all_rooms = self.problem.rooms
+        return len(available_rooms) == 0
 
-            # get any room that is not in the occupied_room_ids
-            available_rooms = [
-                room for room in all_rooms
-                if room.room_id not in occupied_room_ids
-            ]
+    def _calculate_saturation_degree(self, course_id: str, teacher_id: str) -> int:
+        """
+            calculate the number of feasible periods in the timetable at the current point of construction are given priority for the course
+            :param course_id: str
+            :param teacher_id: str
+            :return: int
+        """
 
-            if not available_rooms:
-                return random.choice(self.problem.rooms).clone()
+        saturation_degree = self.problem.number_of_days * self.problem.number_of_periods_per_day
 
-            return max(
-                available_rooms,
-                key=lambda room: room.room_capacity
-            ).clone()
+        for day in range(len(self.schedule)):
+            for period in range(len(self.schedule[day])):
+                if self._already_in_slot(day, period, course_id):
+                    saturation_degree -= 1
+                if self._violating_unavailability_constraint(day, period, course_id):
+                    saturation_degree -= 1
+                if self._violating_curriculum_constraint(day, period, course_id):
+                    saturation_degree -= 1
+                if self._violating_teacher_constraint(day, period, teacher_id):
+                    saturation_degree -= 1
+                if self._violating_room_capacity_constraint(day, period, course_id):
+                    saturation_degree -= 1
+
+        return saturation_degree
+
+    def _get_saturation_degree_dict(self):
+        """"
+            Generates and returns a dictionary of the saturation degree of each course
+            :return: dict
+        """
+        saturation_degree_dict = {
+            course.course_id: self._calculate_saturation_degree(
+                course.course_id,
+                course.teacher_id
+            ) for course in self.courses
+        }
+
+        sorted_courses = sorted(
+            self.courses,
+            key=lambda course: (
+                saturation_degree_dict[course.course_id],
+                -course.number_of_students
+            )
+        )
+
+        return {
+            course.course_id: saturation_degree_dict[course.course_id] for course in sorted_courses
+        }
 
     def initialize_slots(self) -> None:
         """
             Initializes the slots of the timetable.
             :return: None
         """
-        course_dict = {course.course_id: 0 for course in self.problem.courses}
 
-        constraint: Constraint
-        for constraint in self.problem.constraints:
-            course_dict[constraint.course_id] += 1
+        number_of_lectures_left_to_be_scheduled_dict: dict = {
+            course.course_id: course.number_of_lectures for course in self.courses
+        }
 
-        sorted_courses: List[Course] = sorted(
-            self.problem.courses,
-            key=lambda course: course_dict[course.course_id], reverse=True
-        )
+        # while there are courses left to be scheduled
+        while any(
+                number_of_lectures_left_to_be_scheduled_dict[course.course_id] > 0
+                for course in self.courses
+        ):
+            saturation_degree_dict = self._get_saturation_degree_dict()
 
-        course: Course
-        for course in sorted_courses:
-            for _ in range(course.number_of_lectures):
-                day, period, room = self._select_free_slot(course)
+            # get first course in saturation_degree_dict
+            course_id = list(saturation_degree_dict.keys())[0]
 
-                if day == -1 and period == -1 and room is None:
-                    day, period, room = self._get_feasible_slot(course)
+            # decrement number of lectures left to be scheduled for course
+            number_of_lectures_left_to_be_scheduled_dict[course_id] -= 1
+            break
 
-                self.schedule[day][period].course_room_pair.append((course, room))
+    def print(self):
+        """
+        Print a 2d array of the timetable (on each slot print the course id and not the room in course room pairs
+        :return: void
+        """
+        "[ [A, B], [C, D] ] example"
+
+        for day in self.schedule:
+            for slot in day:
+                course_ids = [course.course_id for course, room in slot.course_room_pairs]
+                print(course_ids, end=" ")
+            print()
+        print()
