@@ -23,6 +23,10 @@ class Timetable:
             for _ in range(problem.number_of_days)
         ]
 
+        self.course_and_first_room = {}
+        for course in self.courses:
+            self.course_and_first_room[course.course_id] = ""
+
     def _get_course(self, course_id: str) -> Course:
         """
             Helper function to get a course by its id.
@@ -184,6 +188,7 @@ class Timetable:
     def _get_room_for_course(
             self,
             course_id: str,
+            first_room: str,
             course_room_pairs: List[Tuple[Course, Room]]
     ) -> Room:
         """
@@ -197,6 +202,7 @@ class Timetable:
         number_of_students = course.number_of_students
 
         occupied_rooms_ids = [room.room_id for _, room in course_room_pairs]
+
         available_rooms = [
             room for room in self.rooms
             if room.room_capacity >= number_of_students and room.room_id not in occupied_rooms_ids
@@ -205,6 +211,9 @@ class Timetable:
         available_rooms.sort(key=lambda room: room.room_capacity)
 
         if available_rooms:
+            for room in available_rooms:
+                if room.room_id == first_room:
+                    return room
             return available_rooms[0]
         else:
             not_occupied_rooms = [
@@ -230,8 +239,11 @@ class Timetable:
         course: Course = self._get_course(course_id)
 
         for day, period in feasible_slots:
-            room: Room = self._get_room_for_course(course_id,
-                                                   self.schedule[day][period].course_room_pairs)
+            room: Room = self._get_room_for_course(
+                course_id,
+                self.course_and_first_room[course_id],
+                self.schedule[day][period].course_room_pairs
+            )
 
             self.schedule[day][period].course_room_pairs.append((course, room))
             slots_costs.append(
@@ -254,7 +266,7 @@ class Timetable:
 
         return index_of_smallest_cost
 
-    def _get_feasible_slot(self, course_id: str) -> Tuple[int, int, Room]:
+    def get_feasible_slot(self, course_id: str) -> Tuple[int, int, Room]:
         """
             Returns a feasible slot for a course in the timetable in the form of a tuple (day, period, room)
             :param course_id: str
@@ -281,13 +293,33 @@ class Timetable:
         if len(feasible_slots) > 0:
             feasible_slot_index = self._calculate_soft_constraint(course_id, feasible_slots)
             day, period = feasible_slots[feasible_slot_index]
+
+            first_room_id = self.course_and_first_room[course_id]
+
             room = self._get_room_for_course(
                 course_id,
+                first_room_id,
                 self.schedule[day][period].course_room_pairs
             )
+
+            if first_room_id == "":
+                self.course_and_first_room[course_id] = room.room_id
             return day, period, room
         else:
             print("No feasible slots found for course: " + course_id)
+
+    def clone(self):
+        """
+            Clones the timetable.
+            :return: Timetable
+        """
+
+        timetable = Timetable(self.problem)
+        timetable.schedule = [
+            [slot.clone() for slot in day] for day in self.schedule
+        ]
+
+        return timetable
 
     def initialize_slots(self) -> None:
         """
@@ -311,9 +343,11 @@ class Timetable:
 
             course_id = list(saturation_degree_dict.keys())[0]
             course = [course for course in self.courses if course.course_id == course_id][0]
-            day, period, room = self._get_feasible_slot(course_id)
+            day, period, room = self.get_feasible_slot(course_id)
             self.schedule[day][period].course_room_pairs.append((course, room))
             number_of_lectures_left_to_be_scheduled_dict[course_id] -= 1
+
+        self.print()
 
     def print(self):
         """
@@ -323,7 +357,7 @@ class Timetable:
 
         for day in self.schedule:
             for slot in day:
-                course_ids = [course.course_id for course, room in slot.course_room_pairs]
-                print(course_ids, end=" ")
+                course_ids = [(course.course_id, room.room_id) for course, room in slot.course_room_pairs]
+                print([course_ids], end=" ")
             print()
         print()
