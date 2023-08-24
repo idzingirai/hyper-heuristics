@@ -1,12 +1,12 @@
 from typing import List, Tuple
 
 from constraint import Constraint
+from constraints_validator import get_num_of_violated_soft_constraints
 from course import Course
 from curriculum import Curriculum
 from problem import Problem
 from room import Room
 from slot import Slot
-from constraints_validator import get_num_of_violated_soft_constraints
 
 
 class Timetable:
@@ -23,7 +23,13 @@ class Timetable:
             for _ in range(problem.number_of_days)
         ]
 
-    def _get_course(self, course_id: str):
+    def _get_course(self, course_id: str) -> Course:
+        """
+            Helper function to get a course by its id.
+            :param course_id: str
+            :return: Course
+        """
+
         return [course for course in self.courses if course.course_id == course_id][0]
 
     def _already_in_slot(self, day: int, period: int, course_id: str) -> bool:
@@ -155,6 +161,7 @@ class Timetable:
             Generates and returns a dictionary of the saturation degree of each course
             :return: dict
         """
+
         saturation_degree_dict = {
             course.course_id: self._calculate_saturation_degree(
                 course.course_id,
@@ -179,6 +186,13 @@ class Timetable:
             course_id: str,
             course_room_pairs: List[Tuple[Course, Room]]
     ) -> Room:
+        """
+            Returns the room for a course based on the room occupancy constraint and feasibility
+            :param course_id: str
+            :param course_room_pairs: List[Tuple[Course, Room]]
+            :return: Room
+        """
+
         course = self._get_course(course_id)
         number_of_students = course.number_of_students
 
@@ -204,19 +218,31 @@ class Timetable:
             course_id: str,
             feasible_slots: List[Tuple[int, int]]
     ) -> int:
+        """"
+            Calculates the soft constraint cost for each feasible slot and returns the index of the slot with the
+            smallest cost
+            :param course_id: str
+            :param feasible_slots: List[Tuple[int, int]]
+            :return: int
+        """
+
         slots_costs = []
         course: Course = self._get_course(course_id)
 
         for day, period in feasible_slots:
-            room: Room = self._get_room_for_course(course_id, self.schedule[day][period].course_room_pairs)
+            room: Room = self._get_room_for_course(course_id,
+                                                   self.schedule[day][period].course_room_pairs)
 
             self.schedule[day][period].course_room_pairs.append((course, room))
-            slots_costs.append(get_num_of_violated_soft_constraints(
-                self.schedule,
-                self.problem.curricula,
-                self.courses
-            ))
-            self.schedule[day][period].course_room_pairs.remove(self.schedule[day][period].course_room_pairs[-1])
+            slots_costs.append(
+                get_num_of_violated_soft_constraints(
+                    self.schedule,
+                    self.problem.curricula,
+                    self.courses
+                )
+            )
+            self.schedule[day][period].course_room_pairs.remove(
+                self.schedule[day][period].course_room_pairs[-1])
 
         index_of_smallest_cost = 0
         smallest_cost = slots_costs[index_of_smallest_cost]
@@ -229,6 +255,12 @@ class Timetable:
         return index_of_smallest_cost
 
     def _get_feasible_slot(self, course_id: str) -> Tuple[int, int, Room]:
+        """
+            Returns a feasible slot for a course in the timetable in the form of a tuple (day, period, room)
+            :param course_id: str
+            :return: Tuple[int, int, Room]
+        """
+
         teacher_id = [
             course.teacher_id for course in self.courses if course.course_id == course_id
         ][0]
@@ -249,7 +281,10 @@ class Timetable:
         if len(feasible_slots) > 0:
             feasible_slot_index = self._calculate_soft_constraint(course_id, feasible_slots)
             day, period = feasible_slots[feasible_slot_index]
-            room = self._get_room_for_course(course_id, self.schedule[day][period].course_room_pairs)
+            room = self._get_room_for_course(
+                course_id,
+                self.schedule[day][period].course_room_pairs
+            )
             return day, period, room
         else:
             print("No feasible slots found for course: " + course_id)
@@ -269,23 +304,22 @@ class Timetable:
                 for course in self.courses
         ):
             saturation_degree_dict = self._get_saturation_degree_dict()
+
             for course_id in list(saturation_degree_dict.keys()):
                 if number_of_lectures_left_to_be_scheduled_dict[course_id] == 0:
                     del saturation_degree_dict[course_id]
+
             course_id = list(saturation_degree_dict.keys())[0]
             course = [course for course in self.courses if course.course_id == course_id][0]
             day, period, room = self._get_feasible_slot(course_id)
             self.schedule[day][period].course_room_pairs.append((course, room))
             number_of_lectures_left_to_be_scheduled_dict[course_id] -= 1
 
-        self.print()
-
     def print(self):
         """
-        Print a 2d array of the timetable (on each slot print the course id and not the room in course room pairs
-        :return: void
+            Print a 2d array of the timetable (on each slot print the course id and not the room in course room pairs
+            :return: void
         """
-        "[ [A, B], [C, D] ] example"
 
         for day in self.schedule:
             for slot in day:

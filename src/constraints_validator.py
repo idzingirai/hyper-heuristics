@@ -1,3 +1,4 @@
+from collections import defaultdict
 from itertools import combinations
 from typing import List
 
@@ -240,7 +241,8 @@ def _get_number_of_curriculum_compactness_violations(
 
 
 def _get_number_of_room_stability_violations(
-        schedule: List[List[Slot]]
+        schedule: List[List[Slot]],
+        courses: List[Course]
 ) -> int:
     """
     Courses should be scheduled in the same room as much as possible.
@@ -249,15 +251,22 @@ def _get_number_of_room_stability_violations(
     """
 
     number_of_violations: int = 0
-    course_first_room_map: dict = {}
+    for course in courses:
+        room_count: defaultdict = defaultdict(int)
 
-    for day_slots in schedule:
-        for slot in day_slots:
-            for course, room in slot.course_room_pairs:
-                if course.course_id not in course_first_room_map:
-                    course_first_room_map[course.course_id] = room.room_id
-                if room.room_id != course_first_room_map[course.course_id]:
-                    number_of_violations += 1
+        day: List[Slot]
+        slot: Slot
+        for day in schedule:
+            for slot in day:
+
+                c: Course
+                r: Room
+                for c, r in slot.course_room_pairs:
+                    if course.course_id == c.course_id:
+                        room_count[r.room_id] += 1
+
+        most_common_room_count: int = max(room_count.values(), default=0)
+        number_of_violations += max(0, course.number_of_lectures - most_common_room_count)
 
     return number_of_violations
 
@@ -270,7 +279,12 @@ def get_num_of_violated_soft_constraints(
     number_of_constraints_violated: int = 0
 
     number_of_constraints_violated += _get_number_of_room_capacity_violations(schedule)
-    number_of_constraints_violated += _get_number_of_room_stability_violations(schedule)
+
+    number_of_constraints_violated += _get_number_of_room_stability_violations(
+        schedule,
+        courses
+    )
+
     number_of_constraints_violated += _get_number_of_minimum_working_days_violations(
         courses,
         schedule

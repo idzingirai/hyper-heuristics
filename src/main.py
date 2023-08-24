@@ -3,13 +3,12 @@ import sys
 import time
 
 from config import SEED, PROBLEM_INSTANCES_INDICES
-from problem import Problem
-from src.constraints_validator import get_num_of_violated_hard_constraints, \
+from constraints_validator import get_num_of_violated_hard_constraints, \
     get_num_of_violated_soft_constraints
+from problem import Problem
 from timetable import Timetable
 
 if __name__ == "__main__":
-    #   Seed the whole program
     seed = SEED if (len(sys.argv) < 2 or sys.argv[1] == 'None') else sys.argv[1]
     random.seed(seed)
 
