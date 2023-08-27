@@ -27,6 +27,7 @@ def single_move(timetable: Timetable) -> Timetable:
 
     course_id = course_room_pair[0].course_id
     new_day, new_period, room = timetable.get_feasible_slot(course_id)
+
     timetable.schedule[new_day][new_period].course_room_pairs.append(course_room_pair)
 
     return timetable

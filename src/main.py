@@ -21,30 +21,30 @@ def selection_perturbation_hyper_heuristic(problem: Problem):
 
     print("Perturbation")
 
-    for count in range(100):
+    for count in range(10000):
         clone_timetable = timetable.clone()
         clone_timetable = single_move(clone_timetable)
         if move_acceptance.iterated_limited_threshold_acceptance(timetable, clone_timetable):
             timetable = clone_timetable
 
-    print(
-        "Hard constraints cost before solving: ",
-        get_num_of_violated_hard_constraints(
-            timetable.schedule,
-            timetable.constraints,
-            timetable.curricula,
-            timetable.courses
+        print(
+            "Hard constraints cost before solving: ",
+            get_num_of_violated_hard_constraints(
+                timetable.schedule,
+                timetable.constraints,
+                timetable.curricula,
+                timetable.courses
+            )
         )
-    )
 
-    print(
-        "Soft constraints cost before solving: ",
-        get_num_of_violated_soft_constraints(
-            timetable.schedule,
-            timetable.curricula,
-            timetable.courses
+        print(
+            "Soft constraints cost before solving: ",
+            get_num_of_violated_soft_constraints(
+                timetable.schedule,
+                timetable.curricula,
+                timetable.courses
+            )
         )
-    )
 
 
 if __name__ == "__main__":

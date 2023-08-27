@@ -183,7 +183,7 @@ def _get_number_of_minimum_working_days_violations(
                             if course.course_id == course2.course_id:
                                 if (
                                         abs(a - x)
-                                        < _get_course(course.course_id, courses).min_working_days
+                                        < _get_course(course.course_id, courses).min_working_days - 1
                                 ):
                                     number_of_violations += 1
 
@@ -277,23 +277,38 @@ def get_num_of_violated_soft_constraints(
         courses: List[Course]
 ) -> int:
     number_of_constraints_violated: int = 0
+    number_of_room_capacity_violations: int = 0
+    number_of_room_stability_violations: int = 0
+    number_of_minimum_working_days_violations: int = 0
+    number_of_curriculum_compactness_violations: int = 0
 
-    number_of_constraints_violated += _get_number_of_room_capacity_violations(schedule)
+    # print("-----------------------------------------")
+    number_of_room_capacity_violations = _get_number_of_room_capacity_violations(schedule)
+    # print("Number of room capacity violations: ", number_of_room_capacity_violations)
+    number_of_constraints_violated += number_of_room_capacity_violations
 
-    number_of_constraints_violated += _get_number_of_room_stability_violations(
+    number_of_room_stability_violations = _get_number_of_room_stability_violations(
         schedule,
         courses
     )
+    # print("Number of room stability violations: ", number_of_room_stability_violations)
+    number_of_constraints_violated += number_of_room_stability_violations
 
-    number_of_constraints_violated += _get_number_of_minimum_working_days_violations(
+    number_of_minimum_working_days_violations = _get_number_of_minimum_working_days_violations(
         courses,
         schedule
     )
+    # print("Number of minimum working days violations: ", number_of_minimum_working_days_violations)
+    number_of_constraints_violated += number_of_minimum_working_days_violations
 
-    number_of_constraints_violated += _get_number_of_curriculum_compactness_violations(
+    number_of_curriculum_compactness_violations = _get_number_of_curriculum_compactness_violations(
         curricula,
         schedule
     )
+    # print("Number of curriculum compactness violations: ", number_of_curriculum_compactness_violations)
+    number_of_constraints_violated += number_of_curriculum_compactness_violations
+
+    # print("-----------------------------------------")
 
     return number_of_constraints_violated
 

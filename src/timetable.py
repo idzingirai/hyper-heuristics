@@ -1,3 +1,4 @@
+import random
 from typing import List, Tuple
 
 from constraint import Constraint
@@ -210,7 +211,7 @@ class Timetable:
 
         available_rooms.sort(key=lambda room: room.room_capacity)
 
-        if available_rooms:
+        if len(available_rooms) > 0:
             for room in available_rooms:
                 if room.room_id == first_room:
                     return room
@@ -219,6 +220,14 @@ class Timetable:
             not_occupied_rooms = [
                 room for room in self.rooms if room.room_id not in occupied_rooms_ids
             ]
+
+            if len(not_occupied_rooms) == 0:
+                for room in self.rooms:
+                    if room.room_id == first_room:
+                        return room.clone()
+                    elif room.room_capacity >= number_of_students:
+                        return room.clone()
+
             not_occupied_rooms.sort(key=lambda room: room.room_capacity, reverse=True)
             return not_occupied_rooms[0]
 
@@ -306,7 +315,15 @@ class Timetable:
                 self.course_and_first_room[course_id] = room.room_id
             return day, period, room
         else:
-            print("No feasible slots found for course: " + course_id)
+            day = random.randint(0, len(self.schedule) - 1)
+            period = random.randint(0, len(self.schedule[day]) - 1)
+            room = self._get_room_for_course(
+                course_id,
+                "",
+                self.schedule[day][period].course_room_pairs
+            )
+
+            return day, period, room
 
     def clone(self):
         """
