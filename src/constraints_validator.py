@@ -183,7 +183,8 @@ def _get_number_of_minimum_working_days_violations(
                             if course.course_id == course2.course_id:
                                 if (
                                         abs(a - x)
-                                        < _get_course(course.course_id, courses).min_working_days - 1
+                                        < _get_course(course.course_id,
+                                                      courses).min_working_days - 1
                                 ):
                                     number_of_violations += 1
 
@@ -305,7 +306,8 @@ def get_num_of_violated_soft_constraints(
         curricula,
         schedule
     )
-    # print("Number of curriculum compactness violations: ", number_of_curriculum_compactness_violations)
+    # print("Number of curriculum compactness violations: ",
+    #       number_of_curriculum_compactness_violations)
     number_of_constraints_violated += number_of_curriculum_compactness_violations
 
     # print("-----------------------------------------")

@@ -364,8 +364,6 @@ class Timetable:
             self.schedule[day][period].course_room_pairs.append((course, room))
             number_of_lectures_left_to_be_scheduled_dict[course_id] -= 1
 
-        self.print()
-
     def print(self):
         """
             Print a 2d array of the timetable (on each slot print the course id and not the room in course room pairs
@@ -373,8 +371,16 @@ class Timetable:
         """
 
         for day in self.schedule:
+
+            current_slot_index: int = 0
             for slot in day:
-                course_ids = [(course.course_id, room.room_id) for course, room in slot.course_room_pairs]
-                print([course_ids], end=" ")
-            print()
+                course_room_ids_pairs = [
+                    (course.course_id, room.room_id) for course, room in slot.course_room_pairs
+                ]
+
+                if current_slot_index == len(day) - 1:
+                    print([course_room_ids_pairs], end="\n")
+                else:
+                    print([course_room_ids_pairs], end=" - ")
+                current_slot_index += 1
         print()

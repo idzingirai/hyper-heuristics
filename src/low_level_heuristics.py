@@ -10,6 +10,7 @@ def single_move(timetable: Timetable) -> Timetable:
         :param timetable: Timetable
         :return: Timetable
     """
+
     scheduled_slots: List[Tuple[int, int]] = []
 
     for day in range(len(timetable.schedule)):
@@ -32,19 +33,23 @@ def single_move(timetable: Timetable) -> Timetable:
 
     return timetable
 
-def swap_rooms(timetable: Timetable) -> Timetable:
-    """"
-        swaps two lectures selected a new feasible slot, subject to the hard constraints
-        :param timetable: Timetable
-        :return: Timetable
-    """
-    pass
 
-
-def constrained_based(timetable: Timetable) -> Timetable:
-    """"
-        moves a single lecture selected a new feasible slot, subject to the hard constraints
-        :param timetable: Timetable
-        :return: Timetable
+def swap_slots(timetable: Timetable) -> Timetable:
     """
-    pass
+    Swap two slots selected at random of the timetable
+    :param timetable:
+    :return: timetable
+    """
+
+    first_selected_day = random.randint(0, len(timetable.schedule) - 1)
+    first_selected_period = random.randint(0, len(timetable.schedule[first_selected_day]) - 1)
+    second_selected_day = random.randint(0, len(timetable.schedule) - 1)
+    second_selected_period = random.randint(0, len(timetable.schedule[second_selected_day]) - 1)
+
+    first_slot = timetable.schedule[first_selected_day][first_selected_period].clone()
+    second_slot = timetable.schedule[second_selected_day][second_selected_period].clone()
+
+    timetable.schedule[first_selected_day][first_selected_period] = second_slot
+    timetable.schedule[second_selected_day][second_selected_period] = first_slot
+
+    return timetable
