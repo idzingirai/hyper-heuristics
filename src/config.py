@@ -1,9 +1,13 @@
-DATA_PATH = "../data/"
+import os
+
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_PATH = os.path.join(ROOT_DIR, 'data')
+
 SEED = 999
 # PROBLEM_INSTANCES_INDICES = [21, 8, 7, 3, 17, 11, 12, 17, 20]
-PROBLEM_INSTANCES_INDICES = [21]
+PROBLEM_INSTANCE_INDEX = 21
 
-NUMBER_OF_GENERATIONS = 1000
+NUMBER_OF_GENERATIONS = 10000
 
 MAX_ITERATIONS = 50
 THRESHOLD = 5

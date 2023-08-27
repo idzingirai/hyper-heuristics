@@ -1,7 +1,7 @@
 import os
 from typing import List
 
-import config
+from config import DATA_PATH
 from constraint import Constraint
 from course import Course
 from curriculum import Curriculum
@@ -10,7 +10,7 @@ from room import Room
 
 class Problem:
     def __init__(self, problem_instance_index: int):
-        problem_instance_filenames_list: List[str] = os.listdir(config.DATA_PATH)
+        problem_instance_filenames_list: List[str] = os.listdir(DATA_PATH)
         self.selected_problem_instance_filename: str = problem_instance_filenames_list[
             problem_instance_index
         ]
@@ -118,9 +118,9 @@ class Problem:
             Initializes the problem instance. Reads the file and extracts the information.
             :return: None
         """
-
+        print("Hell")
         with open(
-                f"{config.DATA_PATH}{self.selected_problem_instance_filename}",
+                os.path.join(DATA_PATH, self.selected_problem_instance_filename),
                 "r"
         ) as problem_instance_file:
             self.file_content = problem_instance_file.readlines()
