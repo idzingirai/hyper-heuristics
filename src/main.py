@@ -7,7 +7,7 @@ from config import SEED, PROBLEM_INSTANCES_INDICES
 from low_level_heuristics import single_move, swap_slots
 from perturbation import selection_perturbation_hyper_heuristic
 from problem import Problem
-from src.constraints_validator import get_num_of_violated_hard_constraints, \
+from constraints_validator import get_num_of_violated_hard_constraints, \
     get_num_of_violated_soft_constraints
 from timetable import Timetable
 
