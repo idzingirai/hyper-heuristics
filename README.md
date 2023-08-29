@@ -1,4 +1,4 @@
-# Single-Point Search Selection Perturbative Hyper-Heuristic (SPSSPHH) for the Curriculum-Based Course Timetabling Problem (CB-CTT)
+# Single-Point Search Selection Perturbative Hyper-Heuristic (SPS-SPHH) for the Curriculum-Based Course Timetabling Problem (CB-CTT)
 
 COS 790 - Assignment 1 By Isheanesu Joseph Dzingirai - u20536951
 ---
