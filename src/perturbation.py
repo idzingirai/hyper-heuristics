@@ -1,11 +1,11 @@
 from typing import Tuple
 
 from acceptance import MoveAcceptance
+from config import NUMBER_OF_GENERATIONS
 from constraints_validator import get_num_of_violated_soft_constraints, \
     get_num_of_violated_hard_constraints
 from problem import Problem
 from selection import select_low_level_heuristic
-from config import NUMBER_OF_GENERATIONS
 from timetable import Timetable
 
 
@@ -63,7 +63,7 @@ def selection_perturbation_hyper_heuristic(
             ):
                 overall_best_timetable: Timetable = timetable.clone()
 
-            if ns_num_of_vhc == 0 and ns_num_of_vhc == 0:
+            if ns_num_of_vhc == 0 and ns_num_of_shc == 0:
                 break
         else:
             low_level_heuristics[heuristic_name][0] -= 1

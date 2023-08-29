@@ -118,7 +118,6 @@ class Problem:
             Initializes the problem instance. Reads the file and extracts the information.
             :return: None
         """
-        print("Hell")
         with open(
                 os.path.join(DATA_PATH, self.selected_problem_instance_filename),
                 "r"

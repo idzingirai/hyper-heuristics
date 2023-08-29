@@ -6,7 +6,7 @@ from acceptance import MoveAcceptance
 from config import SEED, PROBLEM_INSTANCE_INDEX
 from constraints_validator import get_num_of_violated_hard_constraints, \
     get_num_of_violated_soft_constraints
-from low_level_heuristics import single_move, swap_slots
+from low_level_heuristics import single_move, swap_slots, swap_lectures
 from perturbation import selection_perturbation_hyper_heuristic
 from problem import Problem
 from timetable import Timetable
@@ -32,7 +32,8 @@ if __name__ == "__main__":
     move_acceptance: MoveAcceptance = MoveAcceptance()
     low_level_heuristic = {
         "single_move": [0, single_move],
-        "swap_slots": [0, swap_slots]
+        "swap_slots": [0, swap_slots],
+        "swap_lectures": [0, swap_lectures]
     }
 
     timetable: Timetable = selection_perturbation_hyper_heuristic(

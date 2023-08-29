@@ -319,7 +319,7 @@ class Timetable:
             period = random.randint(0, len(self.schedule[day]) - 1)
             room = self._get_room_for_course(
                 course_id,
-                "",
+                self.course_and_first_room[course_id],
                 self.schedule[day][period].course_room_pairs
             )
 

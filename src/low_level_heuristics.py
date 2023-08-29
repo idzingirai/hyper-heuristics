@@ -53,3 +53,63 @@ def swap_slots(timetable: Timetable) -> Timetable:
     timetable.schedule[second_selected_day][second_selected_period] = first_slot
 
     return timetable
+
+
+def swap_lectures(timetable: Timetable) -> Timetable:
+    """
+    Swap two lectures selected at random of the timetable
+    :param timetable:
+    :return:
+    """
+    first_day = random.randint(0, len(timetable.schedule) - 1)
+    first_period = random.randint(0, len(timetable.schedule[first_day]) - 1)
+
+    second_day = random.randint(0, len(timetable.schedule) - 1)
+    second_period = random.randint(0, len(timetable.schedule[second_day]) - 1)
+
+    first_slot = timetable.schedule[first_day][first_period].clone()
+    second_slot = timetable.schedule[second_day][second_period].clone()
+
+    if len(first_slot.course_room_pairs) > 0 and len(second_slot.course_room_pairs) > 0:
+        first_course_room_pair = first_slot.course_room_pairs[
+            random.randint(0, len(first_slot.course_room_pairs) - 1)]
+        second_course_room_pair = second_slot.course_room_pairs[
+            random.randint(0, len(second_slot.course_room_pairs) - 1)]
+
+        index: int = 0
+        for course_room_pair in timetable.schedule[first_day][first_period].course_room_pairs:
+            if (
+                    course_room_pair[0].course_id == first_course_room_pair[0].course_id and
+                    course_room_pair[1].room_id == first_course_room_pair[1].room_id
+            ):
+                timetable.schedule[first_day][first_period].course_room_pairs[
+                    index] = second_course_room_pair
+                break
+
+            index += 1
+
+        index = 0
+        for course_room_pair in timetable.schedule[second_day][second_period].course_room_pairs:
+            if (
+                    course_room_pair[0].course_id == second_course_room_pair[0].course_id and
+                    course_room_pair[1].room_id == second_course_room_pair[1].room_id
+            ):
+                timetable.schedule[second_day][second_period].course_room_pairs[
+                    index] = first_course_room_pair
+                break
+
+            index += 1
+
+    elif len(first_slot.course_room_pairs) > 0 and len(second_slot.course_room_pairs) == 0:
+        first_course_room_pair = first_slot.course_room_pairs[
+            random.randint(0, len(first_slot.course_room_pairs) - 1)]
+        first_slot.course_room_pairs.remove(first_course_room_pair)
+        second_slot.course_room_pairs.append(first_course_room_pair)
+
+    elif len(first_slot.course_room_pairs) == 0 and len(second_slot.course_room_pairs) > 0:
+        second_course_room_pair = second_slot.course_room_pairs[
+            random.randint(0, len(second_slot.course_room_pairs) - 1)]
+        second_slot.course_room_pairs.remove(second_course_room_pair)
+        first_slot.course_room_pairs.append(second_course_room_pair)
+
+    return timetable
