@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
-from course import Course
-from room import Room
+from src.common.course import Course
+from src.common.room import Room
 
 
 class Slot:

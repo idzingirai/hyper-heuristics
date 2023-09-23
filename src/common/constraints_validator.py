@@ -2,11 +2,11 @@ from collections import defaultdict
 from itertools import combinations
 from typing import List
 
-from constraint import Constraint
-from course import Course
-from curriculum import Curriculum
-from room import Room
-from slot import Slot
+from src.common.constraint import Constraint
+from src.common.course import Course
+from src.common.curriculum import Curriculum
+from src.common.room import Room
+from src.common.slot import Slot
 
 
 #   For Hard Constraints

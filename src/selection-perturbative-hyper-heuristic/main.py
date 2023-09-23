@@ -4,12 +4,12 @@ import time
 
 from acceptance import MoveAcceptance
 from config import SEED, PROBLEM_INSTANCE_INDEX
-from constraints_validator import get_num_of_violated_hard_constraints, \
+from src.common.constraints_validator import get_num_of_violated_hard_constraints, \
     get_num_of_violated_soft_constraints
 from low_level_heuristics import single_move, swap_slots, swap_lectures
 from perturbation import selection_perturbation_hyper_heuristic
-from problem import Problem
-from timetable import Timetable
+from src.common.problem import Problem
+from src.common.timetable import Timetable
 
 if __name__ == "__main__":
     problem_instance_index: int = int(
