@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 
 from config import DATA_PATH
 from constraint import Constraint
@@ -14,20 +14,20 @@ class Problem:
         self.selected_problem_instance_filename: str = problem_instance_filenames_list[
             problem_instance_index
         ]
-        self.file_content: List[str] | None = None
+        self.file_content: Optional[List[str]] = None
 
-        self.name: str | None = None
-        self.number_of_courses: int | None = None
-        self.number_of_rooms: int | None = None
-        self.number_of_days: int | None = None
-        self.number_of_periods_per_day: int | None = None
-        self.number_of_curricula: int | None = None
-        self.number_of_constraints: int | None = None
+        self.name: Optional[str] = None
+        self.number_of_courses: Optional[int] = None
+        self.number_of_rooms: Optional[int] = None
+        self.number_of_days: Optional[int] = None
+        self.number_of_periods_per_day: Optional[int] = None
+        self.number_of_curricula: Optional[int] = None
+        self.number_of_constraints: Optional[int] = None
 
-        self.courses: List[Course] | None = None
-        self.rooms: List[Room] | None = None
-        self.curricula: List[Curriculum] | None = None
-        self.constraints: List[Constraint] | None = None
+        self.courses: Optional[List[Course]] = None
+        self.rooms: Optional[List[Room]] = None
+        self.curricula: Optional[List[Curriculum]] = None
+        self.constraints: Optional[List[Constraint]] = None
 
     def _extract_basic_information(self) -> None:
         """
