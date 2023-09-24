@@ -3,7 +3,7 @@ import os
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(ROOT_DIR, '..', 'data')
 
-SEED = 16223899
+SEED = 9898
 PROBLEM_INSTANCE_INDEX = 21
 
 LOWER_BOUND = 8

@@ -5,6 +5,9 @@ import time
 from config import SEED, PROBLEM_INSTANCE_INDEX
 from problem import Problem
 from timetable import Timetable
+from chromosome_generator import ChromosomeGenerator
+from grammar import GrammarGenerator
+from grammatical_evolution import GrammaticalEvolution
 
 if __name__ == "__main__":
     problem_instance_index: int = int(
@@ -14,11 +17,19 @@ if __name__ == "__main__":
     seed: int = SEED if (len(sys.argv) < 3 or sys.argv[2] == 'None') else sys.argv[2]
     random.seed(seed)
 
-    start_time: float = time.time()
-
     print("------------------------------------------------------------")
     print(f"Seed: {seed}\n")
-    print(f"Problem instance {problem_instance_index + 1}")
+
+    start_time: float = time.time()
+
+    grammar_generator = GrammarGenerator(terminal_set=['room', 'course', 'day', 'period'])
+    chromosome_generator = ChromosomeGenerator()
+
+    grammatical_evolution = GrammaticalEvolution(
+        chromosome_generator=chromosome_generator,
+        grammar_generator=grammar_generator
+    )
+
     problem_instance: Problem = Problem(problem_instance_index=problem_instance_index)
     problem_instance.initialize()
     print(f"Problem instance {problem_instance_index + 1} initialized.", end="\n\n")
@@ -26,6 +37,8 @@ if __name__ == "__main__":
     timetable: Timetable = Timetable(problem_instance)
     timetable.initialize_slots()
     timetable.print()
+
+    grammatical_evolution.run(timetable)
 
     end_time: float = time.time()
     time_elapsed: float = end_time - start_time
