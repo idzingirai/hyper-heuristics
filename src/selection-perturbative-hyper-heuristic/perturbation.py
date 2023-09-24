@@ -2,11 +2,11 @@ from typing import Tuple
 
 from acceptance import MoveAcceptance
 from config import NUMBER_OF_GENERATIONS
-from src.common.constraints_validator import get_num_of_violated_soft_constraints, \
+from constraints_validator import get_num_of_violated_soft_constraints, \
     get_num_of_violated_hard_constraints
-from src.common.problem import Problem
+from problem import Problem
 from selection import select_low_level_heuristic
-from src.common.timetable import Timetable
+from timetable import Timetable
 
 
 def get_constraints_violation_cost(timetable: Timetable) -> Tuple[int, int]:

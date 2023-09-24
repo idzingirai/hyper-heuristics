@@ -3,8 +3,8 @@ import sys
 import time
 
 from config import SEED, PROBLEM_INSTANCE_INDEX
-from src.common.problem import Problem
-from src.common.timetable import Timetable
+from problem import Problem
+from timetable import Timetable
 
 if __name__ == "__main__":
     problem_instance_index: int = int(

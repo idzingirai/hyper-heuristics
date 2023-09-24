@@ -1,7 +1,7 @@
 from config import MAX_ITERATIONS, THRESHOLD
-from src.common.constraints_validator import get_num_of_violated_hard_constraints, \
+from constraints_validator import get_num_of_violated_hard_constraints, \
     get_num_of_violated_soft_constraints
-from src.common.timetable import Timetable
+from timetable import Timetable
 
 
 class MoveAcceptance:
