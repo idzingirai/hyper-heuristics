@@ -1,18 +1,15 @@
 import random
-import re
-import warnings
 from typing import List
 
-import numpy as np
 from chromosome import Chromosome
 from chromosome_generator import ChromosomeGenerator
 from config import *
-from eval import evaluate_expression
+from eval import calculate_fitness
 from grammar import GrammarGenerator
 from timetable import Timetable
 
 
-def __mutation(chromosome: Chromosome) -> Chromosome:
+def _mutation(chromosome: Chromosome) -> Chromosome:
     """
     Mutates a chromosome.
     :param chromosome: The chromosome to mutate.
@@ -23,7 +20,7 @@ def __mutation(chromosome: Chromosome) -> Chromosome:
     return chromosome
 
 
-def __crossover(first_chromosome: Chromosome, second_chromosome: Chromosome) -> None:
+def _crossover(first_chromosome: Chromosome, second_chromosome: Chromosome) -> None:
     """
     Performs single point crossover between two chromosomes.
     :param first_chromosome: The first parent.
@@ -44,7 +41,6 @@ class GrammaticalEvolution:
 
     def __init__(self, chromosome_generator: ChromosomeGenerator, grammar_generator: GrammarGenerator):
         self.best_solution = None
-        warnings.filterwarnings("ignore")
         self._chromosome_generator = chromosome_generator
         self._grammar = grammar_generator.get_grammar()
         self._terminal_set = grammar_generator.get_terminal_set()
@@ -102,7 +98,7 @@ class GrammaticalEvolution:
                 self.current_codon += 0 if num_of_choices == 1 else 1
 
                 production = choices[index]
-                tokens = [str(production)] if isinstance(production, int)  else production.split()
+                tokens = [str(production)] if isinstance(production, int) else production.split()
                 stack.extend(reversed(tokens))
 
         del codons
@@ -110,8 +106,56 @@ class GrammaticalEvolution:
         chromosome.phenotype = phenotype
         print(phenotype)
 
-    def run(self, timetable: Timetable):
-        population = self.__generate_initial_population()
+    def run(self, initial_timetable: Timetable) -> Chromosome:
+        print("Running Grammatical Evolution...")
+        population: List[Chromosome] = self.__generate_initial_population()
 
+        chromosome: Chromosome
         for chromosome in population:
             self.__map(chromosome)
+            calculate_fitness(chromosome, initial_timetable)
+
+        population.sort(key=lambda individual: (individual.hard_constraints_cost, individual.soft_constraints_cost))
+
+        best_solution: Chromosome = population[0]
+        chromosome: Chromosome
+        num_of_generation: int = 0
+
+        while (
+                num_of_generation < self._max_num_of_generations and
+                (not (best_solution.hard_constraints_cost == 0 and best_solution.soft_constraints_cost == 0))
+        ):
+            first_chromosome: Chromosome = self.__selection(population)
+            second_chromosome: Chromosome = self.__selection(population)
+
+            if random.random() < self._crossover_probability:
+                _crossover(first_chromosome, second_chromosome)
+
+            if random.random() < self._mutation_probability:
+                _mutation(first_chromosome)
+                _mutation(second_chromosome)
+
+            self.__map(first_chromosome)
+            self.__map(second_chromosome)
+
+            calculate_fitness(first_chromosome, initial_timetable)
+            calculate_fitness(second_chromosome, initial_timetable)
+
+            population.append(first_chromosome)
+            population.append(second_chromosome)
+
+            population.sort(key=lambda individual: (individual.hard_constraints_cost, individual.soft_constraints_cost))
+            population = population[:self._population_size]
+
+            if population[0].hard_constraints_cost < best_solution.hard_constraints_cost:
+                best_solution = population[0].clone()
+            elif (
+                    population[0].hard_constraints_cost == best_solution.hard_constraints_cost and
+                    population[0].soft_constraints_cost < best_solution.soft_constraints_cost
+            ):
+                best_solution = population[0].clone()
+
+            num_of_generation += 1
+            print(f"Generation {num_of_generation} best solution: {best_solution.phenotype} ")
+
+        return best_solution

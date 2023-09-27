@@ -2,12 +2,12 @@ import random
 import sys
 import time
 
-from config import SEED, PROBLEM_INSTANCE_INDEX
-from problem import Problem
-from timetable import Timetable
 from chromosome_generator import ChromosomeGenerator
+from config import SEED, PROBLEM_INSTANCE_INDEX
 from grammar import GrammarGenerator
 from grammatical_evolution import GrammaticalEvolution
+from problem import Problem
+from timetable import Timetable
 
 if __name__ == "__main__":
     problem_instance_index: int = int(

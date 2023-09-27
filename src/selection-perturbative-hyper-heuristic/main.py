@@ -2,7 +2,6 @@ import random
 import sys
 import time
 
-
 from acceptance import MoveAcceptance
 from config import SEED, PROBLEM_INSTANCE_INDEX
 from constraints_validator import get_num_of_violated_hard_constraints, \
