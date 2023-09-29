@@ -9,7 +9,6 @@ def _perform_perturbation(chromosome: Chromosome, timetable: Timetable) -> Timet
     :param timetable: The timetable to perturb.
     :return: The perturbed timetable.
     """
-    print(f"Perturbation not implemented yet for chromosome {chromosome.phenotype}.")
     return timetable
 
 
@@ -35,5 +34,6 @@ def calculate_fitness(chromosome: Chromosome, timetable: Timetable) -> None:
         perturbed_timetable.courses
     )
 
+    chromosome.timetable = perturbed_timetable.clone()
     chromosome.hard_constraints_cost = num_of_violated_hard_constraints
     chromosome.soft_constraints_cost = num_of_violated_soft_constraints

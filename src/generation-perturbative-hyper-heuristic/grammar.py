@@ -12,29 +12,17 @@ class GrammarGenerator:
         :return: The grammar in the form of a dictionary.
         """
         return {
-            '<start>': ['<accept> <heuristic>'],
-            '<accept>': ['IO', 'AM'],
-            '<heuristic>': [
-                '( swap <n> ( <compSel> ) )',
-                '( move <n> ( <compSel> ) )',
-                '<heuristic> <cop> <heuristic>',
-                'if ( <cond> <heuristic> <heuristic> )',
-            ],
-            '<cop>': ['impl', 'or'],
-            '<cond>': ['( <rop> <hValue> <hValue> )'],
-            '<n>': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '<n>', '<n> <n>'],
-            '<hValue>': ['prevFitness', 'currFitness'],
-            '<compSel>': [
-                'random ( <comp> )',
-                'highestCost ( <comp> )',
-                'lowestCost ( <comp> )',
-                'highestSize ( <comp> )',
-                'lowestSize ( <comp> )',
-                'if ( <prob> <compSel> <compSel> )',
-            ],
-            '<comp>': self._terminal_set,
-            '<prob>': [25, 50, 75],
-            '<rop>': ['>', '<', '>=', '<=']
+            '<start>': ['<accept> <action> <heuristic>'],
+            '<accept>': ['ILTA', 'AI', 'AEI'],
+            '<heuristic>': ['<action> <heuristic>', '<action>'],
+            '<action>': ['<swap>', '<move>', '<single_move>', '<swap_lectures>', '<swap_slots>', '<action>'],
+            '<swap>': ['swap( <n> <comp> <comp> )'],
+            '<move>': ['move( <n> <comp> <comp> )'],
+            '<single_move>': ['single_move()'],
+            '<swap_lectures>': ['swap_lectures()'],
+            '<swap_slots>': ['swap_slots()'],
+            '<comp>': ['room', 'slot', 'course'],
+            '<n>': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
         }
 
     def get_terminal_set(self) -> List[str]:

@@ -3,11 +3,13 @@ import sys
 import time
 
 from chromosome_generator import ChromosomeGenerator
+from chromosome import Chromosome
 from config import SEED, PROBLEM_INSTANCE_INDEX
 from grammar import GrammarGenerator
 from grammatical_evolution import GrammaticalEvolution
 from problem import Problem
 from timetable import Timetable
+from constraints_validator import get_num_of_violated_hard_constraints, get_num_of_violated_soft_constraints
 
 if __name__ == "__main__":
     problem_instance_index: int = int(
@@ -36,14 +38,17 @@ if __name__ == "__main__":
 
     timetable: Timetable = Timetable(problem_instance)
     timetable.initialize_slots()
-    timetable.print()
 
-    grammatical_evolution.run(timetable)
+    best_solution: Chromosome = grammatical_evolution.run(timetable)
+    best_solution.timetable.print()
 
+    print("\nBest solution: ", best_solution.phenotype)
+    print("Hard constraints cost: ", best_solution.hard_constraints_cost)
+    print("Soft constraints cost: ", best_solution.soft_constraints_cost)
     end_time: float = time.time()
     time_elapsed: float = end_time - start_time
     print(
-        f"Problem instance {problem_instance_index + 1} took {time_elapsed} seconds to solve."
+        f"\nProblem instance {problem_instance_index + 1} took {time_elapsed} seconds to solve."
     )
 
     print("------------------------------------------------------------")

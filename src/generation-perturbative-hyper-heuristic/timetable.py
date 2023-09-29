@@ -1,5 +1,5 @@
 import random
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from constraint import Constraint
 from constraints_validator import get_num_of_violated_soft_constraints
@@ -269,13 +269,13 @@ class Timetable:
         smallest_cost = slots_costs[index_of_smallest_cost]
 
         for index in range(1, len(slots_costs)):
-            if slots_costs[index] < smallest_cost:
+            if slots_costs[index] <= smallest_cost:
                 smallest_cost = slots_costs[index]
                 index_of_smallest_cost = index
 
         return index_of_smallest_cost
 
-    def get_feasible_slot(self, course_id: str) -> Tuple[int, int, Room]:
+    def get_feasible_slot(self, course_id: str, retry: bool) -> Tuple[int, int, Optional[Room]]:
         """
             Returns a feasible slot for a course in the timetable in the form of a tuple (day, period, room)
             :param course_id: str
@@ -300,7 +300,10 @@ class Timetable:
                     feasible_slots.append((day, period))
 
         if len(feasible_slots) > 0:
-            feasible_slot_index = self._calculate_soft_constraint(course_id, feasible_slots)
+            feasible_slot_index = (
+                self._calculate_soft_constraint(course_id, feasible_slots)
+                if retry is False else random.randint(0, len(feasible_slots) - 1)
+            )
             day, period = feasible_slots[feasible_slot_index]
 
             first_room_id = self.course_and_first_room[course_id]
@@ -314,16 +317,8 @@ class Timetable:
             if first_room_id == "":
                 self.course_and_first_room[course_id] = room.room_id
             return day, period, room
-        else:
-            day = random.randint(0, len(self.schedule) - 1)
-            period = random.randint(0, len(self.schedule[day]) - 1)
-            room = self._get_room_for_course(
-                course_id,
-                self.course_and_first_room[course_id],
-                self.schedule[day][period].course_room_pairs
-            )
 
-            return day, period, room
+        return -1, -1, None
 
     def clone(self):
         """
@@ -348,6 +343,8 @@ class Timetable:
             course.course_id: course.number_of_lectures for course in self.courses
         }
 
+        retry: bool = False
+
         while any(
                 number_of_lectures_left_to_be_scheduled_dict[course.course_id] > 0
                 for course in self.courses
@@ -360,7 +357,16 @@ class Timetable:
 
             course_id = list(saturation_degree_dict.keys())[0]
             course = [course for course in self.courses if course.course_id == course_id][0]
-            day, period, room = self.get_feasible_slot(course_id)
+            day, period, room = self.get_feasible_slot(course_id, retry)
+
+            if day == -1 and period == -1 and room is None:
+                self._clear_slots()
+                number_of_lectures_left_to_be_scheduled_dict = {
+                    course.course_id: course.number_of_lectures for course in self.courses
+                }
+                retry = True
+                continue
+
             self.schedule[day][period].course_room_pairs.append((course, room))
             number_of_lectures_left_to_be_scheduled_dict[course_id] -= 1
 
@@ -384,3 +390,14 @@ class Timetable:
                     print([course_room_ids_pairs], end=" - ")
                 current_slot_index += 1
         print()
+
+    def _clear_slots(self):
+        """
+            Clears all the slots in the timetable.
+            :return: void
+        """
+
+        self.schedule = [
+            [Slot() for _ in range(self.problem.number_of_periods_per_day)]
+            for _ in range(self.problem.number_of_days)
+        ]

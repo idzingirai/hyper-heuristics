@@ -76,7 +76,6 @@ class GrammaticalEvolution:
         self.current_codon: int = 0
 
         starting_symbol: str = next(iter(self._grammar.keys()))
-        print(starting_symbol)
         stack: List[str] = [starting_symbol]
         phenotype: str = ''
 
@@ -104,16 +103,15 @@ class GrammaticalEvolution:
         del codons
         del stack
         chromosome.phenotype = phenotype
-        print(phenotype)
 
     def run(self, initial_timetable: Timetable) -> Chromosome:
-        print("Running Grammatical Evolution...")
         population: List[Chromosome] = self.__generate_initial_population()
 
         chromosome: Chromosome
         for chromosome in population:
             self.__map(chromosome)
             calculate_fitness(chromosome, initial_timetable)
+            print(f"Initial chromosome: {chromosome.phenotype} ")
 
         population.sort(key=lambda individual: (individual.hard_constraints_cost, individual.soft_constraints_cost))
 

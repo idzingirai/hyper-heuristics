@@ -1,5 +1,6 @@
 import sys
 from typing import List, Optional
+from timetable import Timetable
 
 
 class Chromosome:
@@ -12,12 +13,14 @@ class Chromosome:
             codons: List[int],
             hard_constraints_cost: int = sys.maxsize,
             soft_constraints_cost: int = sys.maxsize,
-            phenotype: Optional[str] = None
+            phenotype: Optional[str] = None,
+            timetable: Optional[Timetable] = None
     ):
         self.codons: List[int] = codons
         self.hard_constraints_cost: int = hard_constraints_cost
         self.soft_constraints_cost: int = soft_constraints_cost
         self.phenotype: Optional[str] = phenotype
+        self.timetable: Optional[Timetable] = timetable
 
     def __copy__(self):
         """
