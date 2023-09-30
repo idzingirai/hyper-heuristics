@@ -34,5 +34,10 @@ class Chromosome:
         Clones the chromosome.
         :return: A clone of the chromosome.
         """
-        clone_codons: List[int] = [codon for codon in self.codons]
-        return Chromosome(clone_codons)
+        return Chromosome(
+            [codon for codon in self.codons],
+            self.hard_constraints_cost ,
+            self.soft_constraints_cost,
+            self.phenotype,
+            self.timetable.clone() if self.timetable else None
+        )

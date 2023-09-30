@@ -64,7 +64,10 @@ class GrammaticalEvolution:
         :return: The selected chromosome.
         """
         tournament = random.sample(population, self._tournament_size)
-        return min(tournament, key=lambda chromosome: chromosome.fitness)
+        return min(
+            tournament,
+            key=lambda chromosome: (chromosome.hard_constraints_cost, chromosome.soft_constraints_cost)
+        )
 
     def __map(self, chromosome: Chromosome) -> None:
         """
@@ -111,7 +114,6 @@ class GrammaticalEvolution:
         for chromosome in population:
             self.__map(chromosome)
             calculate_fitness(chromosome, initial_timetable)
-            print(f"Initial chromosome: {chromosome.phenotype} ")
 
         population.sort(key=lambda individual: (individual.hard_constraints_cost, individual.soft_constraints_cost))
 
@@ -154,6 +156,5 @@ class GrammaticalEvolution:
                 best_solution = population[0].clone()
 
             num_of_generation += 1
-            print(f"Generation {num_of_generation} best solution: {best_solution.phenotype} ")
 
         return best_solution
