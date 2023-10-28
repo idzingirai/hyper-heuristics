@@ -1,6 +1,6 @@
 import sys
 from typing import List, Optional
-from timetable import Timetable
+from src.common.timetable import Timetable
 
 
 class Chromosome:

@@ -2,7 +2,7 @@ import random
 from typing import List
 
 from chromosome import Chromosome
-from config import UPPER_BOUND, LOWER_BOUND
+from src.common.config import UPPER_BOUND, LOWER_BOUND
 
 
 class ChromosomeGenerator:

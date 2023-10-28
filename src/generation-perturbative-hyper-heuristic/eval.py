@@ -1,6 +1,6 @@
 from acceptance import MoveAcceptance
 from chromosome import Chromosome
-from constraints_validator import get_num_of_violated_hard_constraints, get_num_of_violated_soft_constraints
+from src.common.constraints_validator import get_num_of_violated_hard_constraints, get_num_of_violated_soft_constraints
 from perturbative import *
 
 

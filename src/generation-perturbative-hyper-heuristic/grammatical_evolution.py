@@ -3,10 +3,10 @@ from typing import List
 
 from chromosome import Chromosome
 from chromosome_generator import ChromosomeGenerator
-from config import *
+from src.common.config import POPULATION_SIZE, TOURNAMENT_SIZE, MAX_GENERATIONS, CROSSOVER_PROBABILITY, MUTATION_PROBABILITY
 from eval import calculate_fitness
 from grammar import GrammarGenerator
-from timetable import Timetable
+from src.common.timetable import Timetable
 
 
 def _mutation(chromosome: Chromosome) -> Chromosome:
