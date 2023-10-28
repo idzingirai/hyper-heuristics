@@ -1,16 +1,13 @@
-import sys
-
-sys.path.append("../")
-
 import random
+import sys
 import time
 
 from acceptance import MoveAcceptance
+from low_level_heuristics import single_move, swap_slots, swap_lectures
+from perturbation import selection_perturbation_hyper_heuristic
 from src.common.config import PROBLEM_INSTANCE_INDEX, SEED
 from src.common.constraints_validator import get_num_of_violated_hard_constraints, \
     get_num_of_violated_soft_constraints
-from low_level_heuristics import single_move, swap_slots, swap_lectures
-from perturbation import selection_perturbation_hyper_heuristic
 from src.common.problem import Problem
 from src.common.timetable import Timetable
 

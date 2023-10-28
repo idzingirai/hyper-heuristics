@@ -1,7 +1,7 @@
 from acceptance import MoveAcceptance
 from chromosome import Chromosome
-from constraints_validator import get_num_of_violated_hard_constraints, get_num_of_violated_soft_constraints
 from perturbative import *
+from src.common.constraints_validator import get_num_of_violated_hard_constraints, get_num_of_violated_soft_constraints
 
 
 def _perform_perturbation(chromosome: Chromosome, timetable: Timetable) -> Timetable:
@@ -62,7 +62,6 @@ def calculate_fitness(chromosome: Chromosome, timetable: Timetable) -> None:
         perturbed_timetable.curricula,
         perturbed_timetable.courses
     )
-
 
     chromosome.timetable = perturbed_timetable.clone()
     chromosome.hard_constraints_cost = num_of_violated_hard_constraints

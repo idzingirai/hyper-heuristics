@@ -1,6 +1,7 @@
 import sys
 from typing import List, Optional
-from timetable import Timetable
+
+from src.common.timetable import Timetable
 
 
 class Chromosome:
@@ -36,7 +37,7 @@ class Chromosome:
         """
         return Chromosome(
             [codon for codon in self.codons],
-            self.hard_constraints_cost ,
+            self.hard_constraints_cost,
             self.soft_constraints_cost,
             self.phenotype,
             self.timetable.clone() if self.timetable else None

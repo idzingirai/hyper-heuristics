@@ -3,8 +3,8 @@ import os
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(ROOT_DIR, '..', 'data')
 
-SEED = 7
-PROBLEM_INSTANCE_INDEX = 21
+SEED = 8
+PROBLEM_INSTANCE_INDEX = 1
 
 NUMBER_OF_GENERATIONS = 10000
 
@@ -19,5 +19,3 @@ TOURNAMENT_SIZE = 4
 MAX_GENERATIONS = 100
 CROSSOVER_PROBABILITY = 0.7
 MUTATION_PROBABILITY = 0.3
-
-FITNESS_FUNCTION = 'MedAE'

@@ -1,4 +1,4 @@
-from common import config, constraints_validator, timetable
+from src.common import config, constraints_validator, timetable
 
 
 class MoveAcceptance:
