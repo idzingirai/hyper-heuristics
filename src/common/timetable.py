@@ -1,13 +1,13 @@
 import random
 from typing import List, Tuple
 
-from constraint import Constraint
-from constraints_validator import get_num_of_violated_soft_constraints
-from course import Course
-from curriculum import Curriculum
-from problem import Problem
-from room import Room
-from slot import Slot
+from src.common.constraint import Constraint
+from src.common.constraints_validator import get_num_of_violated_soft_constraints
+from src.common.course import Course
+from src.common.curriculum import Curriculum
+from src.common.problem import Problem
+from src.common.room import Room
+from src.common.slot import Slot
 
 
 class Timetable:

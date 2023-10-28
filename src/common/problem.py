@@ -1,11 +1,15 @@
+import sys
+
+sys.path.append("../")
+
 import os
 from typing import List, Optional
 
-from config import DATA_PATH
-from constraint import Constraint
-from course import Course
-from curriculum import Curriculum
-from room import Room
+from src.common.config import DATA_PATH
+from src.common.constraint import Constraint
+from src.common.course import Course
+from src.common.curriculum import Curriculum
+from src.common.room import Room
 
 
 class Problem:

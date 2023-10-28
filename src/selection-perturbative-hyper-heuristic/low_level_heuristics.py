@@ -1,7 +1,7 @@
 import random
 from typing import List, Tuple
 
-from timetable import Timetable
+from src.common.timetable import Timetable
 
 
 def single_move(timetable: Timetable) -> Timetable:

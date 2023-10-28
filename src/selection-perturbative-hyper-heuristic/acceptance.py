@@ -1,19 +1,16 @@
-from config import MAX_ITERATIONS, THRESHOLD
-from constraints_validator import get_num_of_violated_hard_constraints, \
-    get_num_of_violated_soft_constraints
-from timetable import Timetable
+from common import config, constraints_validator, timetable
 
 
 class MoveAcceptance:
     def __init__(self):
         self.iterations = 0
-        self.max_iterations = MAX_ITERATIONS
-        self.threshold = THRESHOLD
+        self.max_iterations = config.MAX_ITERATIONS
+        self.threshold = config.THRESHOLD
 
     def iterated_limited_threshold_acceptance(
             self,
-            current_solution: Timetable,
-            new_solution: Timetable
+            current_solution: timetable.Timetable,
+            new_solution: timetable.Timetable
     ) -> bool:
         """
             This method implements the iterated limited threshold acceptance algorithm.
@@ -21,27 +18,27 @@ class MoveAcceptance:
             :param new_solution: Timetable
             :return: bool
         """
-        cs_hard_constraints_cost = get_num_of_violated_hard_constraints(
+        cs_hard_constraints_cost = constraints_validator.get_num_of_violated_hard_constraints(
             current_solution.schedule,
             current_solution.constraints,
             current_solution.curricula,
             current_solution.courses
         )
 
-        ns_hard_constraints_cost = get_num_of_violated_hard_constraints(
+        ns_hard_constraints_cost = constraints_validator.get_num_of_violated_hard_constraints(
             new_solution.schedule,
             new_solution.constraints,
             new_solution.curricula,
             new_solution.courses
         )
 
-        cs_soft_constraints_cost = get_num_of_violated_soft_constraints(
+        cs_soft_constraints_cost = constraints_validator.get_num_of_violated_soft_constraints(
             current_solution.schedule,
             current_solution.curricula,
             current_solution.courses
         )
 
-        ns_soft_constraints_cost = get_num_of_violated_soft_constraints(
+        ns_soft_constraints_cost = constraints_validator.get_num_of_violated_soft_constraints(
             new_solution.schedule,
             new_solution.curricula,
             new_solution.courses
