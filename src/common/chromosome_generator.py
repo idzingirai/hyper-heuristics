@@ -1,7 +1,7 @@
 import random
 from typing import List
 
-from chromosome import Chromosome
+from src.common.chromosome import Chromosome
 from src.common.config import UPPER_BOUND, LOWER_BOUND
 
 

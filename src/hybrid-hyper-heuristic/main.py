@@ -1,6 +1,14 @@
 import random
 import sys
 import time
+from typing import List
+
+from src.common.chromosome import Chromosome
+from src.common.chromosome_generator import ChromosomeGenerator
+from src.common.grammar import GrammarGenerator
+from src.common.grammatical_evolution import GrammaticalEvolution
+
+sys.path.append("../../")
 
 from src.common.config import PROBLEM_INSTANCE_INDEX, SEED
 from src.common.constraints_validator import get_num_of_violated_soft_constraints, get_num_of_violated_hard_constraints
@@ -31,8 +39,18 @@ if __name__ == '__main__':
     problem_instance.initialize()
     print(f"Problem instance {problem_instance_index + 1} initialized.", end="\n\n")
 
+    grammar_generator = GrammarGenerator(terminal_set=['room', 'course', 'day', 'period'])
+    chromosome_generator = ChromosomeGenerator()
+
+    grammatical_evolution = GrammaticalEvolution(
+        chromosome_generator=chromosome_generator,
+        grammar_generator=grammar_generator
+    )
+
     timetable: Timetable = Timetable(problem_instance)
     timetable.initialize_slots()
+
+    best_n_solutions: List[Chromosome] = grammatical_evolution.run(timetable, 5)
 
     number_of_violated_hard_constraints: int = get_num_of_violated_hard_constraints(
         timetable.schedule,

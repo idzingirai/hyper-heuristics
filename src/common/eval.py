@@ -1,7 +1,7 @@
-from acceptance import MoveAcceptance
-from chromosome import Chromosome
-from perturbative import *
+from src.common.acceptance import MoveAcceptance
+from src.common.chromosome import Chromosome
 from src.common.constraints_validator import get_num_of_violated_hard_constraints, get_num_of_violated_soft_constraints
+from src.common.generation_perturbative import *
 
 
 def _perform_perturbation(chromosome: Chromosome, timetable: Timetable) -> Timetable:

@@ -2,10 +2,12 @@ import random
 import sys
 import time
 
-from chromosome import Chromosome
-from chromosome_generator import ChromosomeGenerator
-from grammar import GrammarGenerator
-from grammatical_evolution import GrammaticalEvolution
+sys.path.append("../../")
+
+from src.common.chromosome import Chromosome
+from src.common.chromosome_generator import ChromosomeGenerator
+from src.common.grammar import GrammarGenerator
+from src.common.grammatical_evolution import GrammaticalEvolution
 from src.common.config import SEED, PROBLEM_INSTANCE_INDEX
 from src.common.problem import Problem
 from src.common.timetable import Timetable

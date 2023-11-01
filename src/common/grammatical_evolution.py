@@ -1,12 +1,12 @@
 import random
-from typing import List
+from typing import List, Union
 
-from chromosome import Chromosome
-from chromosome_generator import ChromosomeGenerator
-from eval import calculate_fitness
-from grammar import GrammarGenerator
+from src.common.chromosome import Chromosome
+from src.common.chromosome_generator import ChromosomeGenerator
 from src.common.config import POPULATION_SIZE, TOURNAMENT_SIZE, MAX_GENERATIONS, CROSSOVER_PROBABILITY, \
     MUTATION_PROBABILITY
+from src.common.eval import calculate_fitness
+from src.common.grammar import GrammarGenerator
 from src.common.timetable import Timetable
 
 
@@ -108,7 +108,10 @@ class GrammaticalEvolution:
         del stack
         chromosome.phenotype = phenotype
 
-    def run(self, initial_timetable: Timetable) -> Chromosome:
+    def run(self, initial_timetable: Timetable, number_of_perturbatives_to_select=1) -> Union[
+        List[Chromosome],
+        Chromosome
+    ]:
         population: List[Chromosome] = self.__generate_initial_population()
 
         chromosome: Chromosome
@@ -158,4 +161,7 @@ class GrammaticalEvolution:
 
             num_of_generation += 1
 
-        return best_solution
+        if number_of_perturbatives_to_select == 1:
+            return best_solution
+        else:
+            return population[:number_of_perturbatives_to_select]
