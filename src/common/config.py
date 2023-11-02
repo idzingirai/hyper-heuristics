@@ -3,9 +3,8 @@ import os
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(ROOT_DIR, '..', 'data')
 
-#
 SEED = 5778856
-PROBLEM_INSTANCE_INDEX = 7
+PROBLEM_INSTANCE_INDEX = 4
 
 NUMBER_OF_GENERATIONS = 200
 
