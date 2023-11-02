@@ -1,6 +1,6 @@
-# Grammatical Evolution Generation Perturbative Hyper-Heuristic (GE-GPHH) for the Curriculum-Based Course Timetabling Problem (CB-CTT)
+# Hybrid Hyper Heuristic for the Curriculum-Based Course Timetabling Problem (CB-CTT)
 
-COS 790 - Assignment 2 By Isheanesu Joseph Dzingirai - u20536951
+COS 790 - Assignment 3 By Isheanesu Joseph Dzingirai - u20536951
 ---
 
 Instructions
@@ -20,6 +20,6 @@ To change the problem instance to run and seed, please open the config.py file a
 Alternatively, you can run the hyper-heuristic using the following
 command `python main.py <seed> <problem_instance_index>` or `python3 main.py <seed> <problem_instance_index>`.
 
-The report is in the directory "../reports" with the name "Generation Perturbative Hyper-Heuristic Report.pdf
+The report is in the directory "../reports" with the name "Hybrid Hyper-Heuristic Report.pdf
 
 ---

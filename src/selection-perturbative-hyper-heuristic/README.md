@@ -20,6 +20,6 @@ To change the problem instance to run and seed, please open the config.py file a
 Alternatively, you can run the hyper-heuristic using the following
 command `python main.py <seed> <problem_instance_index>` or `python3 main.py <seed> <problem_instance_index>`.
 
-The report is in the directory reports/Assignment 1 and is named "u20536951 - Assignment 1 Report.pdf".
+The report is in the directory "../reports" with the name "Selection Perturbative Hyper-Heuristic Report.pdf
 
 ---
