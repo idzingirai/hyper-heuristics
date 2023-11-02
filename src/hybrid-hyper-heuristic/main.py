@@ -3,17 +3,19 @@ import sys
 import time
 from typing import List
 
+sys.path.append("../../")
+
+from src.common.acceptance import MoveAcceptance
 from src.common.chromosome import Chromosome
 from src.common.chromosome_generator import ChromosomeGenerator
 from src.common.grammar import GrammarGenerator
 from src.common.grammatical_evolution import GrammaticalEvolution
 
-sys.path.append("../../")
-
 from src.common.config import PROBLEM_INSTANCE_INDEX, SEED
 from src.common.constraints_validator import get_num_of_violated_soft_constraints, get_num_of_violated_hard_constraints
 from src.common.problem import Problem
 from src.common.timetable import Timetable
+from hyperdized_perturbation import selection_perturbation_hyper_heuristic
 
 if __name__ == '__main__':
     problem_instance_index: int = int(
@@ -50,24 +52,36 @@ if __name__ == '__main__':
     timetable: Timetable = Timetable(problem_instance)
     timetable.initialize_slots()
 
+    print(f"Starting grammatical evolution.")
+
     best_n_solutions: List[Chromosome] = grammatical_evolution.run(timetable, 5)
 
+    print(f"Starting hyperdized perturbation hyper-heuristic.")
+    moveAcceptance = MoveAcceptance()
+    best_timetable = selection_perturbation_hyper_heuristic(timetable, best_n_solutions, moveAcceptance)
+
     number_of_violated_hard_constraints: int = get_num_of_violated_hard_constraints(
-        timetable.schedule,
-        timetable.constraints,
-        timetable.curricula,
-        timetable.courses
+        best_timetable.schedule,
+        best_timetable.constraints,
+        best_timetable.curricula,
+        best_timetable.courses
     )
 
     number_of_violated_soft_constraints: int = get_num_of_violated_soft_constraints(
-        timetable.schedule,
-        timetable.curricula,
-        timetable.courses
+        best_timetable.schedule,
+        best_timetable.curricula,
+        best_timetable.courses
     )
 
     print("Hard constraints cost before solving: ", number_of_violated_hard_constraints)
+    print("Soft constraints cost before solving: ", number_of_violated_soft_constraints, end="\n\n")
+
+    best_timetable.print()
+
+    end_time: float = time.time()
+    time_elapsed: float = end_time - start_time
     print(
-        "Soft constraints cost before solving: ",
-        number_of_violated_soft_constraints,
-        end="\n\n"
+        f"Problem instance {problem_instance_index + 1} took {time_elapsed} seconds to solve."
     )
+
+    print("------------------------------------------------------------")

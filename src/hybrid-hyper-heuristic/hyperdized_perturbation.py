@@ -1,11 +1,12 @@
-from typing import Tuple
+from typing import Tuple, List
 
-from selection import select_low_level_heuristic
+from hyperdized_selection import select_low_level_heuristic
 from src.common.acceptance import MoveAcceptance
+from src.common.chromosome import Chromosome
 from src.common.config import NUMBER_OF_GENERATIONS
 from src.common.constraints_validator import get_num_of_violated_soft_constraints, \
     get_num_of_violated_hard_constraints
-from src.common.problem import Problem
+from src.common.generation_perturbative import single_move, swap_slots, swap_lectures
 from src.common.timetable import Timetable
 
 
@@ -32,27 +33,50 @@ def get_constraints_violation_cost(timetable: Timetable) -> Tuple[int, int]:
     return number_of_violated_hard_constraints, number_of_violated_soft_constraints
 
 
+def perform_perturbation(chromosome: Chromosome, timetable: Timetable) -> Timetable:
+    """
+    Performs a perturbation on the timetable.
+    :param timetable: The timetable to perturb.
+    :return: The perturbed timetable.
+    """
+    move_acceptance: MoveAcceptance = MoveAcceptance()
+    previous_timetable: Timetable = chromosome.timetable.clone() if chromosome.timetable else timetable.clone()
+    current_timetable: Timetable = previous_timetable.clone()
+    best_timetable: Timetable = previous_timetable.clone()
+
+    expression: str = chromosome.phenotype
+    expression_tokens: List[str] = expression.split()
+
+    for index in range(1, len(expression_tokens)):
+        if expression_tokens[index] == "single_move()":
+            current_timetable = single_move(current_timetable)
+        elif expression_tokens[index] == 'swap_slots()':
+            current_timetable = swap_slots(current_timetable)
+        elif expression_tokens[index] == 'swap_lectures()':
+            current_timetable = swap_lectures(current_timetable)
+        else:
+            continue
+
+    return best_timetable
+
+
 def selection_perturbation_hyper_heuristic(
-        problem: Problem,
-        low_level_heuristics: dict,
+        timetable: Timetable,
+        low_level_heuristics: List[Chromosome],
         move_acceptance: MoveAcceptance
 ) -> Timetable:
-    timetable: Timetable = Timetable(problem=problem)
-    timetable.initialize_slots()
-
     overall_best_timetable: Timetable = timetable.clone()
 
     generation: int
     for count in range(NUMBER_OF_GENERATIONS):
-        heuristic_name: str = select_low_level_heuristic(low_level_heuristics)
-        heuristic = low_level_heuristics[heuristic_name][1]
+        selected_heuristic: Chromosome = select_low_level_heuristic(low_level_heuristics)
 
         clone_timetable: Timetable = timetable.clone()
-        clone_timetable: Timetable = heuristic(clone_timetable)
+        clone_timetable: Timetable = perform_perturbation(selected_heuristic, clone_timetable)
 
         if move_acceptance.iterated_limited_threshold_acceptance(timetable, clone_timetable):
             timetable: Timetable = clone_timetable
-            low_level_heuristics[heuristic_name][0] += 1
+            selected_heuristic.reinforcement_learning_score += 1
 
             ns_num_of_vhc, ns_num_of_shc = get_constraints_violation_cost(timetable)
             os_num_of_vhc, os_num_of_shc = get_constraints_violation_cost(overall_best_timetable)
@@ -66,6 +90,6 @@ def selection_perturbation_hyper_heuristic(
             if ns_num_of_vhc == 0 and ns_num_of_shc == 0:
                 break
         else:
-            low_level_heuristics[heuristic_name][0] -= 1
+            selected_heuristic.reinforcement_learning_score -= 1
 
-    return timetable
+    return overall_best_timetable

@@ -12,12 +12,14 @@ class Chromosome:
     def __init__(
             self,
             codons: List[int],
+            reinforcement_learning_score: int = 0,
             hard_constraints_cost: int = sys.maxsize,
             soft_constraints_cost: int = sys.maxsize,
             phenotype: Optional[str] = None,
             timetable: Optional[Timetable] = None
     ):
         self.codons: List[int] = codons
+        self.reinforcement_learning_score = reinforcement_learning_score
         self.hard_constraints_cost: int = hard_constraints_cost
         self.soft_constraints_cost: int = soft_constraints_cost
         self.phenotype: Optional[str] = phenotype
@@ -28,7 +30,13 @@ class Chromosome:
         Copies the chromosome.
         :return: A copy of the chromosome.
         """
-        return Chromosome(self.codons.copy(), self.hard_constraints_cost, self.soft_constraints_cost, self.phenotype)
+        return Chromosome(
+            self.codons.copy(),
+            self.reinforcement_learning_score,
+            self.hard_constraints_cost,
+            self.soft_constraints_cost,
+            self.phenotype
+        )
 
     def clone(self) -> 'Chromosome':
         """
@@ -37,6 +45,7 @@ class Chromosome:
         """
         return Chromosome(
             [codon for codon in self.codons],
+            self.reinforcement_learning_score,
             self.hard_constraints_cost,
             self.soft_constraints_cost,
             self.phenotype,

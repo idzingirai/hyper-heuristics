@@ -1,7 +1,10 @@
 #!/bin/bash
 
-instances=(3 4 7 8 11 12 14 15 16 17 20 21)
-seeds=(5778856 16223899 22878896 68625033 101006424 113139835 125838671 213232696 311489368 376423770)
+instances=(4 7 8 11 12 14 15 16 17 20 21)
+
+#Generate 50 random seeds between 1 and 999999999
+seeds=($(shuf -i 1-999999999 -n 10))
+
 
 # Loop through instance and loop through seeds and run Python script and write to file
 for i in "${instances[@]}"
